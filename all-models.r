@@ -18,6 +18,12 @@ source("run-model.r");
 
 history = NULL;
 
+
+output = function(filename) {
+    output_dir = "./output/"
+    return(paste(output_dir, filename, sep=""))
+}
+
 ## Experiment definitions
 
 bp = list(
@@ -42,7 +48,7 @@ bp = list(
             num.experimental.items = 18,                       
             retrievals = "bp-bad-retrievals.txt",
             items      = "bp-bad-items.txt",
-            data = 1,
+            data = 0,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -54,7 +60,7 @@ bp = list(
             num.experimental.items = 18,
             retrievals = "bp-interferer-retrievals.txt",
             items      = "bp-interferer-items.txt",
-            data = 2,
+            data = 0,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -196,59 +202,60 @@ colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", 
 ## Finally, form the complete model run matrix.
 all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs));
 
-pdf(file="activation-plots.pdf",width=11,height=5);
+
 
 
 ## Loop over all runs and run the models
 for (r in 1:total.runs) {
-  output.file = "output.html";
-  print(paste("Executing run #",r,"of",total.runs));
-  
-  ## select out row corresponding to this run
-  this.run = all.runs[r,];      
-  
-  ## now set the model parameters according to this combination of values
-  set.parameters(this.run[1:num.parameters]);
-  
-  ## and run the model
-  item.file = as.character(this.run$items);
-  retrieval.file = as.character(this.run$retrievals);
-  num.experimental.items = this.run$num.experimental.items;
-  num.experimental.subjects = this.run$num.experimental.subjects;
-
-#  results = run.model.quietly();
-  results = run.model(quiet=FALSE);
-
-  ## plot the activation profiles for the critical and distractor items
-    clrs = c("black", "green","blue","orange", "brown");
-
-       plot.activation(moments, history, this.run$correct.item,
-                        this.run$distractor.item,
-                        this.run$experiment, this.run$condition);
-  
-
-  ## now extract the relevant measure
-
-  if (this.run$measure=="percent error") {
-    crit.ret = results[[this.run$critical.retrieval]];
-    model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100;
-    model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100;
-    model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100;        
-  }
-  else {
-    model.result = NA;
-    model.result.lower = NA;
-    model.result.upper = NA;        
-    print(paste("The", this.run$measure, "measure is not yet implemented."));
-  }
-  all.runs[r,]$model = model.result;
-  all.runs[r,]$model.lower = model.result.lower;
-  all.runs[r,]$model.upper = model.result.upper;
-
-  
+    pdf(file=output(paste(r, "-activation-plots.pdf", sep="")), width=11, height=5)
+    output.file = output(paste(r, "-output.html", sep=""))
+    print(paste("Executing run #",r,"of",total.runs))
+    
+    ## select out row corresponding to this run
+    this.run = all.runs[r,];      
+    
+    ## now set the model parameters according to this combination of values
+    set.parameters(this.run[1:num.parameters]);
+    
+    ## and run the model
+    item.file = as.character(this.run$items);
+    retrieval.file = as.character(this.run$retrievals);
+    num.experimental.items = this.run$num.experimental.items;
+    num.experimental.subjects = this.run$num.experimental.subjects;
+    
+     results = run.model.quietly();
+    results = run.model(quiet=FALSE);
+    
+    ## plot the activation profiles for the critical and distractor items
+      clrs = c("black", "green","blue","orange", "brown", "red", "purple");
+    
+         plot.activation(moments, history, this.run$correct.item,
+                          this.run$distractor.item,
+                          this.run$experiment, this.run$condition);
+    
+    
+    ## now extract the relevant measure
+    
+    if (this.run$measure=="percent error") {
+      crit.ret = results[[this.run$critical.retrieval]];
+      model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100;
+      model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100;
+      model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100;        
+    }
+    else {
+      model.result = NA;
+      model.result.lower = NA;
+      model.result.upper = NA;        
+      print(paste("The", this.run$measure, "measure is not yet implemented."));
+    }
+    all.runs[r,]$model = model.result;
+    all.runs[r,]$model.lower = model.result.lower;
+    all.runs[r,]$model.upper = model.result.upper;
+    
+    dev.off();
 }
 
-dev.off();
+
 
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
@@ -374,7 +381,7 @@ plot.best.overall.no.decay = function() {
   subs = combo.summary[combo.summary$d==0.001,];
   c = subs$combo[which.min(subs$mse)];
   
-  pdf(file="best-overall-no-decay.pdf",height=11,width=8.5);
+  pdf(file=output("best-overall-no-decay.pdf"), height=11, width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
@@ -405,7 +412,7 @@ plot.best.overall.no.decay.no.mp = function() {
   subs = combo.summary[combo.summary$d==0.001 & combo.summary$match.penalty==0,];
   c = subs$combo[which.min(subs$mse)];
   
-  pdf(file="best-overall-no-decay-no-mp.pdf",height=11,width=8.5);
+  pdf(file=output("best-overall-no-decay-no-mp.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
@@ -433,7 +440,7 @@ plot.best.overall.no.decay.no.mp = function() {
 
   
 plot.individual.no.decay = function() {
-  pdf(file="best-individual-no-decay.pdf",height=11,width=8.5);
+  pdf(file=output("best-individual-no-decay.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
   model.points = c();
@@ -461,7 +468,7 @@ plot.individual.no.decay = function() {
 
   
 plot.individual.no.decay.no.mp = function() {
-  pdf(file="best-individual-no-decay-no-mp.pdf",height=11,width=8.5);
+  pdf(file=output("best-individual-no-decay-no-mp.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
   model.points = c();
@@ -494,7 +501,7 @@ plot.best.overall.decay = function() {
   subs = combo.summary[combo.summary$d==0.5,];
   c = subs$combo[which.min(subs$mse)];
   
-  pdf(file="best-overall-decay.pdf",height=11,width=8.5);
+  pdf(file=output("best-overall-decay.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
@@ -525,7 +532,7 @@ plot.best.overall.decay.no.mp = function() {
   subs = combo.summary[combo.summary$d==0.5 & combo.summary$match.penalty==0,];
   c = subs$combo[which.min(subs$mse)];
   
-  pdf(file="best-overall-decay-no-mp.pdf",height=11,width=8.5);
+  pdf(file=output("best-overall-decay-no-mp.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
@@ -554,7 +561,7 @@ plot.best.overall.decay.no.mp = function() {
 
   
 plot.individual.decay = function() {
-  pdf(file="best-individual-decay.pdf",height=11,width=8.5);
+  pdf(file=output("best-individual-decay.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
   model.points = c();
@@ -581,7 +588,7 @@ plot.individual.decay = function() {
 
   
 plot.individual.decay.no.mp = function() {
-  pdf(file="best-individual-decay-no-mp.pdf",height=11,width=8.5);
+  pdf(file=output("best-individual-decay-no-mp.pdf"),height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
   model.points = c();
@@ -649,7 +656,7 @@ plot.experiment.all.combos = function(exp,decay=TRUE) {
 
 
 plot.full.range.decay = function() {
-  pdf(file="full-range-decay.pdf",height=10,width=10);
+  pdf(file=output("full-range-decay.pdf"),height=10,width=10);
 #  par(mfrow=c(3,3))
   par(bty="n",xpd=NA);
   par(mgp=c(2.8,1,0));
@@ -666,7 +673,7 @@ plot.full.range.decay = function() {
 
 
 plot.full.range.no.decay = function() {
-  pdf(file="full-range-no-decay.pdf",height=10,width=10);
+  pdf(file=output("full-range-no-decay.pdf"),height=10,width=10);
 #  par(mfrow=c(3,3))
   par(bty="n",xpd=NA);
   par(mgp=c(2.8,1,0));
