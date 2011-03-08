@@ -9,11 +9,10 @@
 ###  2 Feb 2007
 ###
 ###
-#########################################################################################################
+########################################################################################################
 
 library(reshape);
 library(gplots);
-
 
 source("run-model.r");
 
@@ -22,54 +21,47 @@ history = NULL;
 ## Experiment definitions
 
 bp = list(
-	name = "bp",
-	description ="Brazilian Portuguese Null Subjects",
-	conditions = list(
-		list(condition = "Good",
-			num.experimental.subjects = 45,
-			num.experimental.items = 18,
-			retrievals = "bp-good-retrievals.txt",
-			items = "bp-good-items.txt",
-			data = 0,                   # human data = zero, Table 4
-			measure="percent error",
-			correct.item = 1,
-			distractor.item = 2,
-			critical.retrieval = 2),   # second retrieval is critical
-          
-		list(condition = "Bad",
-          	num.experimental.subjects = 45,
-          	num.experimental.items = 18,                       
-          	retrievals = "bp-bad-retrievals.txt",
-          	items = "bp-bad-items.txt",
-          	data = 1,
-          	measure="percent error",
-          	correct.item = 1,
-          	distractor.item = 2,
-          	critical.retrieval = 2),   
-          
-		list(condition = "Interferer",
- 			num.experimental.subjects = 45,
- 			num.experimental.items = 18,
- 			retrievals = "bp-interferer-retrievals.txt",
- 			items = "bp-interferer-items.txt",
- 			data = 2,
- 			measure="percent error",
- 			correct.item = 1,
- 			distractor.item = 2,
- 			critical.retrieval = 2),
-    
-		list(condition = "Interferer",
-			num.experimental.subjects = 45,
-			num.experimental.items = 18,
-			retrievals = "bp-interferer-retrievals.txt",
-			items = "bp-interferer-items.txt",
-			data = 2,
-			measure="percent error",
-			correct.item = 1,
-			distractor.item = 2,
-			critical.retrieval = 2)
-		)
-	)
+    name = "bp",
+    description ="Brazilian Portuguese Null Subjects",
+    conditions = list(
+        list(
+            condition = "Good",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "bp-good-retrievals.txt",
+            items      = "bp-good-items.txt",
+            data = 0,                   # human data = zero, Table 4
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   # second retrieval is critical
+
+        list(
+            condition = "Bad",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,                       
+            retrievals = "bp-bad-retrievals.txt",
+            items      = "bp-bad-items.txt",
+            data = 1,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   
+
+        list(
+            condition = "Interferer",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "bp-interferer-retrievals.txt",
+            items      = "bp-interferer-items.txt",
+            data = 2,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2)
+        )
+    )
+
 
 
 ## Complete list of experiments
@@ -198,8 +190,7 @@ total.runs = total.conditions * num.combinations;
 full.parameter.matrix = matrix(data=t(p.matrix), nrow=total.runs,
                                 ncol=num.params, byrow=TRUE);
 colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
-                                     "var.mismatch.penalty",
-                   "modulate.by.distinct", "distinctiveness");
+                                     "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness");
 
 
 ## Finally, form the complete model run matrix.
@@ -299,11 +290,9 @@ for (e in 1:num.experiments) {
 aggregate.parameter.matrix = matrix(data=t(p.matrix), nrow=num.combinations*num.experiments,
                                 ncol=num.params, byrow=TRUE);
 colnames(aggregate.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
-                                          "var.mismatch.penalty",
-                   "modulate.by.distinct", "distinctiveness");
+                                          "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness");
 
 param.results = cbind(aggregate.parameter.matrix, param.results);
-
 
 r.melt = melt(param.results,measure.var=c("r2","mse","smse","spearman"),variable="variable")
 
@@ -314,8 +303,7 @@ spearman.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "spearman")
 combo.summary = cbind(p.matrix,r2.summary[2],mse.summary[2],spearman.summary[2]);
 
 colnames(combo.summary) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
-                             "var.mismatch.penalty",
-                   "modulate.by.distinct", "distinctiveness","r2","mse","spearman");
+                             "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness","r2","mse","spearman");
 
 combo.summary = as.data.frame(combo.summary);
 
