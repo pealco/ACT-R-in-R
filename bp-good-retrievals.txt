@@ -1,4 +1,4 @@
 moment	1650	1950
 number	PL	PL
 cat	DP	DP
-role	NULL	NULL
+role	specT	specT
