@@ -1,0 +1,9 @@
+name	NP1	P1	PP1	NP2	VP1
+created	0	150	300	600	900
+gender	masc	nil	nil	fem	nil
+cat	NP	Prep	PP	NP	VP
+case-nm	yes	nil	nil	no	nil
+case-ac	no	nil	nil	yes	nil
+case-nm2	yes	nil	nil	no	nil
+case-ac2	no	nil	nil	yes	nil
+role	specT	headPP	adjNP	compP	headI
