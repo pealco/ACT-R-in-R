@@ -17,11 +17,11 @@ library(gplots);
 
 source("run-model.r");
 
-history <- NULL;
+history = NULL;
 
 ## Experiment definitions
 
-slovak2a <- list(name = "slovak2a",
+slovak2a = list(name = "slovak2a",
                 description ="Badecker & Kuminiak (2006) Slovak Experiment 2",
                 conditions = list(
                   list(condition = "Unambig. masculine head, unambig. feminine distractor",
@@ -74,13 +74,13 @@ slovak2a <- list(name = "slovak2a",
 
 
 ## Complete list of experiments
-experiments <- list(slovak2a)
-num.experiments <- length(experiments);
+experiments = list(slovak2a)
+num.experiments = length(experiments);
 
 
 ## number of monte carlo trials per experiment
-default.trials <- 1000;
-#simulated.experiments <- 50;
+default.trials = 1000;
+#simulated.experiments = 50;
 
 
 
@@ -88,43 +88,43 @@ default.trials <- 1000;
 ## of possible values rather than a single value.  
 
 ## Latency factor
-F <- c(1)
-#F <- c(0.1, 0.15, 0.2);
+F = c(1)
+#F = c(0.1, 0.15, 0.2);
 
 
 ## Extra category penalty
-cat.penalty <- c(-999);
+cat.penalty = c(-999);
 
 
 ## Total source activation
-#G <- c(0.7, 0.8, 1.0);
-G <- c(1.0);
+#G = c(0.7, 0.8, 1.0);
+G = c(1.0);
 
 
 ## Activation noise parameter for logistic distribution
-ans  <- c(0.15)  #, 0.2)
+ans  = c(0.15)  #, 0.2)
 
 ## Fan parameter
-mas <- c(1.5)  #, 2.0)
+mas = c(1.5)  #, 2.0)
 
 
 ## Base level decay parameter
-#d <- c(0.001,0.5);
+#d = c(0.001,0.5);
 
-d <- c(0.5);
+d = c(0.5);
 
 
 ## Match penalty
-match.penalty <- c(0)
-## match.penalty <- c(0, -0.1)
+match.penalty = c(0)
+## match.penalty = c(0, -0.1)
 
 
 
 ## Following are non-ACT-R modifications that we turn off by default
-var.mismatch.penalty <- c(FALSE);
-VAR.fan <- c(0);    # additional fan associated with VAR retrieval cues
-modulate.by.distinct <- c(FALSE);
-distinctiveness <- c(0);                # Note that the quantitative parameter has no
+var.mismatch.penalty = c(FALSE);
+VAR.fan = c(0);    # additional fan associated with VAR retrieval cues
+modulate.by.distinct = c(FALSE);
+distinctiveness = c(0);                # Note that the quantitative parameter has no
                                         # effect when modulate.by.distinct is FALSE. So this is some  wasted
                                         # effort in the simple code below.
 
@@ -134,44 +134,44 @@ distinctiveness <- c(0);                # Note that the quantitative parameter h
 ## column is a parameter; each row is a distinct comabination of parameters
 ## defining a model simulation to run.
 
-parameters <- list(cat.penalty, F, G, ans, mas, d, match.penalty, VAR.fan, var.mismatch.penalty,
+parameters = list(cat.penalty, F, G, ans, mas, d, match.penalty, VAR.fan, var.mismatch.penalty,
                    modulate.by.distinct, distinctiveness);
-num.parameters <- length(parameters);
+num.parameters = length(parameters);
 
 
 ## The total number of combinations is the product of the number of values
 ## for each parameter
-num.combinations <- prod(as.vector(lapply(parameters, length), mode="integer"));
+num.combinations = prod(as.vector(lapply(parameters, length), mode="integer"));
 
 
 ## Set up matrix of parameter combinations.  Rows are model experiments,
 ## columns are parameters.
-num.params <- length(parameters);
-p.matrix <- matrix(nrow=num.combinations, ncol=num.params);
+num.params = length(parameters);
+p.matrix = matrix(nrow=num.combinations, ncol=num.params);
 
-cumulative.num.combs <- 1;
+cumulative.num.combs = 1;
 for (p in 1:num.params) {
-  p.matrix[,p] <- rep(parameters[p][[1]], each=cumulative.num.combs, length.out=num.combinations);
-  cumulative.num.combs <- cumulative.num.combs * length(parameters[p][[1]]);
+  p.matrix[,p] = rep(parameters[p][[1]], each=cumulative.num.combs, length.out=num.combinations);
+  cumulative.num.combs = cumulative.num.combs * length(parameters[p][[1]]);
 }
 
 
 
 ##  Now set up matrix of unique model runs.
-count.conditions <- function(e) {
+count.conditions = function(e) {
   length(e$conditions);
 }
 
-total.conditions <- sum(as.vector(lapply(experiments, count.conditions),
+total.conditions = sum(as.vector(lapply(experiments, count.conditions),
                                   mode="integer"));
-model.runs <- data.frame();
+model.runs = data.frame();
 
 for (e in 1:num.experiments) {
-  exp.name <- experiments[[e]]$name;
+  exp.name = experiments[[e]]$name;
   for (c in 1:length(experiments[[e]]$conditions)) {
-    cond <- experiments[[e]]$conditions[[c]];
+    cond = experiments[[e]]$conditions[[c]];
     
-    model.runs <- rbind(model.runs,
+    model.runs = rbind(model.runs,
                         data.frame(experiment = rep(exp.name,num.combinations),
                                    condition = rep(cond$condition, num.combinations),
                                    retrievals = rep(cond$retrievals, num.combinations),
@@ -196,43 +196,43 @@ for (e in 1:num.experiments) {
 
 
 # Duplicate the parameter matrix "total.conditions" number of times.
-total.runs <- total.conditions * num.combinations;
+total.runs = total.conditions * num.combinations;
 
-full.parameter.matrix <- matrix(data=t(p.matrix), nrow=total.runs,
+full.parameter.matrix = matrix(data=t(p.matrix), nrow=total.runs,
                                 ncol=num.params, byrow=TRUE);
-colnames(full.parameter.matrix) <- c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
+colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
                                      "var.mismatch.penalty",
                    "modulate.by.distinct", "distinctiveness");
 
 
 ## Finally, form the complete model run matrix.
-all.runs <- as.data.frame(cbind(full.parameter.matrix, model.runs));
+all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs));
 
 pdf(file="activation-plots.pdf",width=11,height=5);
 
 
 ## Loop over all runs and run the models
 for (r in 1:total.runs) {
-  output.file <- "output.html";
+  output.file = "output.html";
   print(paste("Executing run #",r,"of",total.runs));
   
   ## select out row corresponding to this run
-  this.run <- all.runs[r,];      
+  this.run = all.runs[r,];      
   
   ## now set the model parameters according to this combination of values
   set.parameters(this.run[1:num.parameters]);
   
   ## and run the model
-  item.file <- as.character(this.run$items);
-  retrieval.file <- as.character(this.run$retrievals);
-  num.experimental.items <- this.run$num.experimental.items;
-  num.experimental.subjects <- this.run$num.experimental.subjects;
+  item.file = as.character(this.run$items);
+  retrieval.file = as.character(this.run$retrievals);
+  num.experimental.items = this.run$num.experimental.items;
+  num.experimental.subjects = this.run$num.experimental.subjects;
 
-#  results <- run.model.quietly();
-  results <- run.model(quiet=FALSE);
+#  results = run.model.quietly();
+  results = run.model(quiet=FALSE);
 
   ## plot the activation profiles for the critical and distractor items
-    clrs <- c("black", "green","blue","orange", "brown");
+    clrs = c("black", "green","blue","orange", "brown");
 
        plot.activation(moments, history, this.run$correct.item,
                         this.run$distractor.item,
@@ -242,20 +242,20 @@ for (r in 1:total.runs) {
   ## now extract the relevant measure
 
   if (this.run$measure=="percent error") {
-    crit.ret <- results[[this.run$critical.retrieval]];
-    model.result <- crit.ret$retrieval.prob[this.run$distractor.item] * 100;
-    model.result.lower <- crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100;
-    model.result.upper <- crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100;        
+    crit.ret = results[[this.run$critical.retrieval]];
+    model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100;
+    model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100;
+    model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100;        
   }
   else {
-    model.result <- NA;
-    model.result.lower <- NA;
-    model.result.upper <- NA;        
+    model.result = NA;
+    model.result.lower = NA;
+    model.result.upper = NA;        
     print(paste("The", this.run$measure, "measure is not yet implemented."));
   }
-  all.runs[r,]$model <- model.result;
-  all.runs[r,]$model.lower <- model.result.lower;
-  all.runs[r,]$model.upper <- model.result.upper;
+  all.runs[r,]$model = model.result;
+  all.runs[r,]$model.lower = model.result.lower;
+  all.runs[r,]$model.upper = model.result.upper;
 
   
 }
@@ -265,7 +265,7 @@ dev.off();
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
 
-param.results <- data.frame(experiment=rep(NA,num.combinations*num.experiments),
+param.results = data.frame(experiment=rep(NA,num.combinations*num.experiments),
                             combo=rep(NA,num.combinations*num.experiments),
                             r2=rep(NA,num.combinations*num.experiments),
                             mse=rep(NA,num.combinations*num.experiments),
@@ -274,69 +274,69 @@ param.results <- data.frame(experiment=rep(NA,num.combinations*num.experiments),
 
 print("Computing aggregate model fits for each unique parameter setting....");
 
-i <- 1;
+i = 1;
 
 for (e in 1:num.experiments) {
-  exp <- experiments[[e]]$name;
+  exp = experiments[[e]]$name;
   
   for (j in 1:num.combinations) {
     print(paste("    parameter setting #",j,"of",num.combinations));
-    index <- seq(from=j, to=total.runs, by=num.combinations);
-    runs <- all.runs[index,];
-    runs.exp <- runs[runs$experiment==exp,];
-    param.results$combo[i] <- j;
-    param.results$experiment[i] <- exp;
+    index = seq(from=j, to=total.runs, by=num.combinations);
+    runs = all.runs[index,];
+    runs.exp = runs[runs$experiment==exp,];
+    param.results$combo[i] = j;
+    param.results$experiment[i] = exp;
 
-    d <- runs.exp$data;
-    m <- runs.exp$model;
+    d = runs.exp$data;
+    m = runs.exp$model;
     
-    param.results$r2[i] <- cor(d, m)^2;
-    param.results$spearman[i] <- cor(d, m, method="spearman");
-    param.results$mse[i] <- mean((d - m)^2);
-    param.results$smse[i] <- sqrt(param.results$mse[i]);
-    i <- i + 1;
+    param.results$r2[i] = cor(d, m)^2;
+    param.results$spearman[i] = cor(d, m, method="spearman");
+    param.results$mse[i] = mean((d - m)^2);
+    param.results$smse[i] = sqrt(param.results$mse[i]);
+    i = i + 1;
   }
 }
 
 
-aggregate.parameter.matrix <- matrix(data=t(p.matrix), nrow=num.combinations*num.experiments,
+aggregate.parameter.matrix = matrix(data=t(p.matrix), nrow=num.combinations*num.experiments,
                                 ncol=num.params, byrow=TRUE);
-colnames(aggregate.parameter.matrix) <- c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
+colnames(aggregate.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
                                           "var.mismatch.penalty",
                    "modulate.by.distinct", "distinctiveness");
 
-param.results <- cbind(aggregate.parameter.matrix, param.results);
+param.results = cbind(aggregate.parameter.matrix, param.results);
 
 
-r.melt <- melt(param.results,measure.var=c("r2","mse","smse","spearman"),variable="variable")
+r.melt = melt(param.results,measure.var=c("r2","mse","smse","spearman"),variable="variable")
 
-r2.summary <- cast(r.melt, combo ~ .,mean,subset = (variable == "r2"));
-mse.summary <- cast(r.melt, combo ~ .,mean,subset = (variable == "mse"));
-spearman.summary <- cast(r.melt, combo ~ .,mean,subset = (variable == "spearman"));
+r2.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "r2"));
+mse.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "mse"));
+spearman.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "spearman"));
 
-combo.summary <- cbind(p.matrix,r2.summary[2],mse.summary[2],spearman.summary[2]);
+combo.summary = cbind(p.matrix,r2.summary[2],mse.summary[2],spearman.summary[2]);
 
-colnames(combo.summary) <- c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
+colnames(combo.summary) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
                              "var.mismatch.penalty",
                    "modulate.by.distinct", "distinctiveness","r2","mse","spearman");
 
-combo.summary <- as.data.frame(combo.summary);
+combo.summary = as.data.frame(combo.summary);
 
-combo.summary$combo <- seq(1:length(combo.summary[,1]));
+combo.summary$combo = seq(1:length(combo.summary[,1]));
 
 
 
-plot.experiment <- function(exp, combo) {
-  index <- seq(from=combo, to=total.runs, by=num.combinations);
-  runs <- all.runs[index,];
-  runs.exp <- runs[runs$experiment==exp,];
-  ht <- as.matrix(cbind(runs.exp$data, runs.exp$model));
+plot.experiment = function(exp, combo) {
+  index = seq(from=combo, to=total.runs, by=num.combinations);
+  runs = all.runs[index,];
+  runs.exp = runs[runs$experiment==exp,];
+  ht = as.matrix(cbind(runs.exp$data, runs.exp$model));
 
-#  ht.lower <-as.matrix(cbind(runs.exp$data.lower, runs.exp$model.lower));
-#  ht.upper <-as.matrix(cbind(runs.exp$data.upper, runs.exp$model.upper));
+#  ht.lower =as.matrix(cbind(runs.exp$data.lower, runs.exp$model.lower));
+#  ht.upper =as.matrix(cbind(runs.exp$data.upper, runs.exp$model.upper));
 
-  param.names <- colnames(all.runs)[1:num.parameters];
-  param.values <- runs[1,1:num.parameters];
+  param.names = colnames(all.runs)[1:num.parameters];
+  param.values = runs[1,1:num.parameters];
   
   barplot2(height=ht,
            bty="n",
@@ -375,7 +375,7 @@ plot.experiment <- function(exp, combo) {
 
 
 
-get.description <- function(exp) {
+get.description = function(exp) {
   for (i in 1:num.experiments) {
     if (experiments[[i]]$name == exp)
       return(experiments[[i]]$description)
@@ -385,23 +385,23 @@ get.description <- function(exp) {
 
 
 
-plot.best.overall.no.decay <- function() {
-  subs <- combo.summary[combo.summary$d==0.001,];
-  c <- subs$combo[which.min(subs$mse)];
+plot.best.overall.no.decay = function() {
+  subs = combo.summary[combo.summary$d==0.001,];
+  c = subs$combo[which.min(subs$mse)];
   
   pdf(file="best-overall-no-decay.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
 
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));    
   }
  
@@ -416,23 +416,23 @@ plot.best.overall.no.decay <- function() {
 
 
 
-plot.best.overall.no.decay.no.mp <- function() {
-  subs <- combo.summary[combo.summary$d==0.001 & combo.summary$match.penalty==0,];
-  c <- subs$combo[which.min(subs$mse)];
+plot.best.overall.no.decay.no.mp = function() {
+  subs = combo.summary[combo.summary$d==0.001 & combo.summary$match.penalty==0,];
+  c = subs$combo[which.min(subs$mse)];
   
   pdf(file="best-overall-no-decay-no-mp.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
 
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));    
   }
  
@@ -447,21 +447,21 @@ plot.best.overall.no.decay.no.mp <- function() {
 
 
   
-plot.individual.no.decay <- function() {
+plot.individual.no.decay = function() {
   pdf(file="best-individual-no-decay.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
-    m <- which.min(this.exp$mse);
-    c <- this.exp$combo[m];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.001),];
+    m = which.min(this.exp$mse);
+    c = this.exp$combo[m];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));        
   }
 
@@ -475,21 +475,21 @@ plot.individual.no.decay <- function() {
 
 
   
-plot.individual.no.decay.no.mp <- function() {
+plot.individual.no.decay.no.mp = function() {
   pdf(file="best-individual-no-decay-no-mp.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.001) & (param.results$match.penalty==0),];
-    m <- which.min(this.exp$mse);
-    c <- this.exp$combo[m];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.001) & (param.results$match.penalty==0),];
+    m = which.min(this.exp$mse);
+    c = this.exp$combo[m];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));        
   }
 
@@ -505,23 +505,23 @@ plot.individual.no.decay.no.mp <- function() {
 
 
 
-plot.best.overall.decay <- function() {
-  subs <- combo.summary[combo.summary$d==0.5,];
-  c <- subs$combo[which.min(subs$mse)];
+plot.best.overall.decay = function() {
+  subs = combo.summary[combo.summary$d==0.5,];
+  c = subs$combo[which.min(subs$mse)];
   
   pdf(file="best-overall-decay.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
 
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));    
   }
  
@@ -536,23 +536,23 @@ plot.best.overall.decay <- function() {
 
 
 
-plot.best.overall.decay.no.mp <- function() {
-  subs <- combo.summary[combo.summary$d==0.5 & combo.summary$match.penalty==0,];
-  c <- subs$combo[which.min(subs$mse)];
+plot.best.overall.decay.no.mp = function() {
+  subs = combo.summary[combo.summary$d==0.5 & combo.summary$match.penalty==0,];
+  c = subs$combo[which.min(subs$mse)];
   
   pdf(file="best-overall-decay-no-mp.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));
 
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
 
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));    
   }
  
@@ -568,21 +568,21 @@ plot.best.overall.decay.no.mp <- function() {
 
 
   
-plot.individual.decay <- function() {
+plot.individual.decay = function() {
   pdf(file="best-individual-decay.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
-    m <- which.min(this.exp$mse);
-    c <- this.exp$combo[m];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.5),];
+    m = which.min(this.exp$mse);
+    c = this.exp$combo[m];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));        
   }
 
@@ -595,21 +595,21 @@ plot.individual.decay <- function() {
 }
 
   
-plot.individual.decay.no.mp <- function() {
+plot.individual.decay.no.mp = function() {
   pdf(file="best-individual-decay-no-mp.pdf",height=11,width=8.5);
 #  par(mfrow=c(3,2));
  par(pin=c(6.5,3.5));   # this is a hack to make the Slovak graph wider
-  model.points <- c();
-  data.points <- c();
+  model.points = c();
+  data.points = c();
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
-    this.exp <- param.results[(param.results$experiment==exp) & (param.results$d==0.5) & (param.results$match.penalty==0),];
-    m <- which.min(this.exp$mse);
-    c <- this.exp$combo[m];
-    plotted.points <- plot.experiment(exp, c);
-    data.points <- c(data.points, plotted.points[,1]);
-    model.points <- c(model.points, plotted.points[,2]);
+    exp = experiments[[e]]$name;
+    this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.5) & (param.results$match.penalty==0),];
+    m = which.min(this.exp$mse);
+    c = this.exp$combo[m];
+    plotted.points = plot.experiment(exp, c);
+    data.points = c(data.points, plotted.points[,1]);
+    model.points = c(model.points, plotted.points[,2]);
     par(pin=c(3.5,3.5));        
   }
 
@@ -625,20 +625,20 @@ plot.individual.decay.no.mp <- function() {
 
 
 
-plot.experiment.all.combos <- function(exp,decay=TRUE) {
+plot.experiment.all.combos = function(exp,decay=TRUE) {
   ## set up plot
   if (decay) {
-    runs.exp <- all.runs[(all.runs$experiment==exp & all.runs$d==0.5),];
+    runs.exp = all.runs[(all.runs$experiment==exp & all.runs$d==0.5),];
   } else {
-    runs.exp <- all.runs[(all.runs$experiment==exp & all.runs$d==0.001),];
+    runs.exp = all.runs[(all.runs$experiment==exp & all.runs$d==0.001),];
   }
       
-  num.runs <- length(runs.exp[,1]);
-  num.conds <- length(unique(runs.exp$condition));
+  num.runs = length(runs.exp[,1]);
+  num.conds = length(unique(runs.exp$condition));
   ## only works if even (e.g. both decay and not decay)
-  num.combs <- num.runs/num.conds;
+  num.combs = num.runs/num.conds;
 
-  dummy <- data.frame(condition = 1:num.conds,
+  dummy = data.frame(condition = 1:num.conds,
                       m = rep(0,num.conds));
   plot(m ~ condition,
        data = dummy,
@@ -651,8 +651,8 @@ plot.experiment.all.combos <- function(exp,decay=TRUE) {
        );
 
   for (combo in 1:num.combs) {
-    index <- seq(from=combo, to=num.runs,by=num.combs);
-    r <- runs.exp[index,];
+    index = seq(from=combo, to=num.runs,by=num.combs);
+    r = runs.exp[index,];
     lines(x=1:num.conds, y=r$model,type="l",lty=1,col="grey50",pch=c(20));
   }
 
@@ -663,7 +663,7 @@ plot.experiment.all.combos <- function(exp,decay=TRUE) {
 
 
 
-plot.full.range.decay <- function() {
+plot.full.range.decay = function() {
   pdf(file="full-range-decay.pdf",height=10,width=10);
 #  par(mfrow=c(3,3))
   par(bty="n",xpd=NA);
@@ -673,14 +673,14 @@ plot.full.range.decay <- function() {
   par(cex.axis=1.05,cex.lab=1.1);
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
+    exp = experiments[[e]]$name;
     plot.experiment.all.combos(exp,decay=TRUE);
   }
   dev.off();
 }
 
 
-plot.full.range.no.decay <- function() {
+plot.full.range.no.decay = function() {
   pdf(file="full-range-no-decay.pdf",height=10,width=10);
 #  par(mfrow=c(3,3))
   par(bty="n",xpd=NA);
@@ -690,7 +690,7 @@ plot.full.range.no.decay <- function() {
   par(cex.axis=1.05,cex.lab=1.1);
   
   for (e in 1:num.experiments) {
-    exp <- experiments[[e]]$name;
+    exp = experiments[[e]]$name;
     plot.experiment.all.combos(exp,decay=FALSE);
   }
   dev.off();
