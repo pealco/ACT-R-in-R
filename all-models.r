@@ -36,7 +36,7 @@ bp = list(
             num.experimental.items = 18,
             retrievals = "bp-good-retrievals.txt",
             items      = "bp-good-items.txt",
-            data = 0,                   # human data = zero, Table 4
+            data = 0,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -202,9 +202,6 @@ colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", 
 ## Finally, form the complete model run matrix.
 all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs));
 
-
-
-
 ## Loop over all runs and run the models
 for (r in 1:total.runs) {
     pdf(file=output(paste(r, "-activation-plots.pdf", sep="")), width=11, height=5)
@@ -223,14 +220,13 @@ for (r in 1:total.runs) {
     num.experimental.items = this.run$num.experimental.items;
     num.experimental.subjects = this.run$num.experimental.subjects;
     
-     results = run.model.quietly();
-    results = run.model(quiet=FALSE);
+    results = run.model.quietly();
+    #results = run.model(quiet=FALSE);
     
     ## plot the activation profiles for the critical and distractor items
-      clrs = c("black", "green","blue","orange", "brown", "red", "purple");
+    clrs = c("black", "green","blue","orange", "brown", "red", "purple");
     
-         plot.activation(moments, history, this.run$correct.item,
-                          this.run$distractor.item,
+    plot.activation(moments, history, this.run$correct.item, this.run$distractor.item,
                           this.run$experiment, this.run$condition);
     
     
