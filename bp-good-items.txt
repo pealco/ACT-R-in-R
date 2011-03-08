@@ -1,0 +1,5 @@
+name	DP1	DP2	VP1	PP1	DP3	VP2	VP3	PP
+created	0	300	600	900	1200	1500	1800	2100
+cat	DP	DP	VP	PP	DP	VP	VP	PP
+number	PL	SG	SG	nil	SG	PL	PL	nil
+role	specT	specT	headVP	headPP	compP	headVP	headVP	headPP

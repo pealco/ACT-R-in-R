@@ -21,65 +21,68 @@ history = NULL;
 
 ## Experiment definitions
 
-bp = list(
-	name = "bp",
-	description ="Brazilian Portuguese Null Subjects",
-	conditions = list(
-		list(condition = "Good",
-			num.experimental.subjects = 45,
-			num.experimental.items = 18,
-			retrievals = "bp-good-retrievals.txt",
-			items = "bp-good-items.txt",
-			data = 0,                   # human data = zero, Table 4
-			measure="percent error",
-			correct.item = 1,
-			distractor.item = 2,
-			critical.retrieval = 2),   # second retrieval is critical
-          
-		list(condition = "Bad",
-          	num.experimental.subjects = 45,
-          	num.experimental.items = 18,                       
-          	retrievals = "bp-bad-retrievals.txt",
-          	items = "bp-bad-items.txt",
-          	data = 1,
-          	measure="percent error",
-          	correct.item = 1,
-          	distractor.item = 2,
-          	critical.retrieval = 2),   
-          
-		list(condition = "Interferer",
- 			num.experimental.subjects = 45,
- 			num.experimental.items = 18,
- 			retrievals = "bp-interferer-retrievals.txt",
- 			items = "bp-interferer-items.txt",
- 			data = 2,
- 			measure="percent error",
- 			correct.item = 1,
- 			distractor.item = 2,
- 			critical.retrieval = 2),
-    
-		list(condition = "Interferer",
-			num.experimental.subjects = 45,
-			num.experimental.items = 18,
-			retrievals = "bp-interferer-retrievals.txt",
-			items = "bp-interferer-items.txt",
-			data = 2,
-			measure="percent error",
-			correct.item = 1,
-			distractor.item = 2,
-			critical.retrieval = 2)
-		)
-	)
+slovak2a = list(name = "slovak2a",
+                description ="Badecker & Kuminiak (2006) Slovak Experiment 2",
+                conditions = list(
+                  list(condition = "Unambig. masculine head, unambig. feminine distractor",
+                       num.experimental.subjects = 45,
+                       num.experimental.items = 18,
+                       retrievals = "slovak-exp2a-retrievals.txt",
+                       items = "slovak-exp2a-head-MU-local-FU-items.txt",
+                       data = 0,                   # human data = zero, Table 4
+                       measure="percent error",
+                       correct.item = 1,
+                       distractor.item = 4,
+                       critical.retrieval = 3),   # third retrieval is critical
+                  
+                  list(condition = "Unambig. masculine head, ambig. feminine distractor",
+                       num.experimental.subjects = 45,
+                       num.experimental.items = 18,                       
+                       retrievals = "slovak-exp2a-retrievals.txt",
+                       items = "slovak-exp2a-head-MU-local-FA-items.txt",
+                       data = 1,
+                       measure="percent error",
+                       correct.item = 1,
+                       distractor.item = 4,
+                       critical.retrieval = 3),   
+                  
+                  list(condition = "Ambig. masculine head, unambig. feminine distractor",
+                       num.experimental.subjects = 45,
+                       num.experimental.items = 18,
+                       retrievals = "slovak-exp2a-retrievals.txt",
+                       items = "slovak-exp2a-head-MA-local-FU-items.txt",
+                       data = 2,
+                       measure="percent error",
+                       correct.item = 1,
+                       distractor.item = 4,
+                       critical.retrieval = 3),   
+                  
+                  list(condition = "Ambig. masculine head, ambig. feminine distractor",
+                       num.experimental.subjects = 45,
+                       num.experimental.items = 18,                       
+                       retrievals = "slovak-exp2a-retrievals.txt",
+                       items = "slovak-exp2a-head-MA-local-FA-items.txt",
+                       data = 15,
+                                        # ((49)/(175+49)) x 100 = 22
+                                        #proportion of scorable responses, NO MARKEDNESS CODING-Bill
+                                        #averaged across FM & MF conditions, data should be
+                                        # ((49+18)/(175+49+214+18)) x 100 = 15
+                       measure="percent error",
+					   correct.item = 1,
+					   distractor.item = 4,
+                       critical.retrieval = 3)));
 
 
 ## Complete list of experiments
-experiments = list(bp)
+experiments = list(slovak2a)
 num.experiments = length(experiments);
 
 
 ## number of monte carlo trials per experiment
 default.trials = 1000;
-simulated.experiments = 50;
+#simulated.experiments = 50;
+
+
 
 ## Discrete parameter space to search.  Each parameter now contains a list
 ## of possible values rather than a single value.  
