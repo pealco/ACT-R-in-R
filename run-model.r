@@ -206,6 +206,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
         base.activations[,j] = rowMeans(activation)
     }
     
+    # Plot only correct item and distractor item.
     plotting.items = c(correct.item, distractor)
     clrs = c("black", "red")
     
@@ -224,31 +225,21 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
              cex=1,
              col = clrs[1:2],)
     }
-
+    
+    # Plot all items.
     plotting.items = 1:num.items
 
     clrs = c("black","purple","green","blue","orange")
-
     clrs[correct.item] = "black"
     clrs[distractor] = "red"
 
-    plot(base.activations[1,] ~ ticks,
-        type="n", #lwd=2,col=clrs[1],
-        main=paste("Mean activation of items,", trials,"trial",
-        "Exp:", experiment, "Condition:", condition),
-        ylab="Activation", xlab="Time")
-    
-    for (j in 1:length(plotting.items)) {
-        c = plotting.items[j]
-        
-        print(paste("Plotting item",c))
-        
-        lines(base.activations[c,] ~ ticks, type="l", lwd=4, col=clrs[j])  
-    }
+    matplot(ticks, t(base.activations), type="l", 
+        main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
+        ylab="Activation", xlab="Time", lwd=4, lty=1, col=clrs)
     
     width = max.time - min.time
     height = max(base.activations)
-    legend(0.5*width+min.time, height-0.5, item.name, lty=1,lwd=4,bty="n",
+    legend("top", item.name, lty=1,lwd=4,bty="n",
            cex=1,
            col = clrs[1:num.items],)
 }
