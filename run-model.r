@@ -154,6 +154,11 @@ run.model = function(quiet=TRUE) {
             rtable = xtable(summary,caption=paste("Result at ",moment,"ms",sep=""))
             print(file=output.file, rtable, caption.placement="top",append=TRUE,type="html")
             write(file=output.file,"</TD></TABLE><HR size=5 noshade>",append=TRUE)
+            
+            params = rbind(c("Latency factor", "Total source activation", "Activation noise", "Fan parameter", "Base level decay"), 
+                            c(F, G, ans, mas, d))
+            params.table = xtable(params)
+            print(file=output.file, params.table, append=TRUE, type="html")
         }      
         ## update the history with what just happened at this moment
         moments <<- c(moments, moment)
@@ -169,10 +174,6 @@ run.model = function(quiet=TRUE) {
     }
     
     if (!quiet) {
-        clrs = c("black","red","green","blue","orange")
-        
-        ## plot activations from time=0 to time =1100
-        #plot.activation.profiles(moments, history, 1, 1100)
         dev.off()
     }
     return(complete.results)
@@ -189,11 +190,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     min.time = 0
     max.time = moments[length(moments)] + 200
 
-    print("    Computing complete history of activation values.")
-
-    ticks = seq(min.time,max.time,10)
-    num.ticks = length(ticks)
-    
+    ticks = seq(min.time,max.time,10)    
     base.activations = foreach(t = ticks, .combine="cbind") %dopar% {
         base.levels = compute.base.levels(t)
         exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
@@ -212,14 +209,23 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     matplot(ticks, t(base.activations[plotting.items,]), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
         ylab="Activation", xlab="Time", lwd=4, lty=1)
+    
+    maxb = max(base.activations, na.rm=TRUE)
+    minb = min(base.activations, na.rm=TRUE)
+    
+    for (m in creation.moment) {
+      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=2, col="darkgreen")
+    }
+
+    for (m in setdiff(moments, creation.moment)) {
+      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=4, col="red")
+    }
 
     legend("top", c("Head NP","Distractor NP"), 
         lty=1, lwd=4, bty="n", cex=1, col = clrs[1:2],)
     
     # Plot all items.
-    plotting.items = 1:num.items
-
-    clrs = c("black","purple","green","blue","orange")
+    clrs = c("black","purple","green","blue","orange", "yellow")
     clrs[correct.item] = "black"
     clrs[distractor] = "red"
 
@@ -230,3 +236,58 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     legend("top", item.name, 
         lty=1, lwd=4, bty="n", cex=1, col = clrs[1:num.items],)
 }
+
+#plot.activation.profiles = function(moments, history, min.time, max.time, increment=10,
+#                                     creation.moments, item.names=item.name) {
+#    time.span = seq(min.time, max.time, increment)
+#    base.activations = matrix(nrow=num.items, ncol=length(time.span))
+#
+##    print("Computing complete history of activation values at times....")
+#
+#    #  First compute the history of activation values at each time point
+#    j = 1
+#    for (t in time.span) {
+##    if (round(t/100)==t/100) {print(t)}
+#      base.levels = compute.base.levels(t)
+#
+#    # make items that don't exist yet have activation of NA
+#    exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
+#    activation  = base.levels*exists + 0*!exists
+#        activation[activation==0] = NA
+#
+#    # take mean activation over all the monte carlo trials
+#    base.activations[, j] = rowMeans(activation)
+#        j = j + 1
+#    }
+#
+#    maxb = max(base.activations, na.rm=TRUE)
+#    minb = min(base.activations, na.rm=TRUE)
+#
+#    plot(base.activations[1,] ~ time.span,
+#               type="l", lwd=1.5, col=clrs[1],
+#               main=paste("Mean activation of items over time (", trials," runs)", sep=""),
+#               sub="Green bars indicate initial encoding points, red bars indicate retrieval points",
+#               ylab="Activation", xlab="Time",
+#               ylim=c(minb-0.5, maxb+0.5))
+#
+#    lines(x=c(min(time.span), max(time.span)), y=c(0, 0), lty=3)
+#
+#    for (c in 1:num.items) {
+#      lines(base.activations[c,] ~ time.span, type="l", lwd=1.5, col=clrs[c])
+#    }
+#
+#    # add markers for the creation and retrieval moments at the bottom
+#    for (m in creation.moment) {
+#      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=2, col="darkgreen")
+#    }
+#
+#    for (m in setdiff(moments, creation.moment)) {
+#      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=4, col="red")
+#    }
+#
+#    # add a legend
+#    width = max.time - min.time
+#    height = maxb
+#    legend(0.8*width+min.time, height+0.5, item.name, lty=1, lwd=1.5, bty="n", col = clrs[1:num.items])
+#  }
+#
