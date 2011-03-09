@@ -236,24 +236,24 @@ colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", 
 all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs))
 
 ## Loop over all runs and run the models
-start = Sys.time()
-for (r in 1:total.runs) {
+#start = Sys.time()
+foreach (r = icount(total.runs), .combine="+") %dopar% {
     print(paste("Executing run #",r,"of",total.runs))
     
     ## select out row corresponding to this run
     this.run = all.runs[r,]
     
     ## set output file name
-    filename.prefix = paste(this.run$experiment, "-", this.run$condition, "-", r, sep="")
-    output.file = output(paste(filename.prefix, "-output.html", sep=""))
+    #filename.prefix = paste(this.run$experiment, "-", this.run$condition, "-", r, sep="")
+    #output.file = output(paste(filename.prefix, "-output.html", sep=""))
     
     ## now set the model parameters according to this combination of values
     set.parameters(this.run[1:num.parameters])
     
     ## and run the model
-    item.file = as.character(this.run$items)
-    retrieval.file = as.character(this.run$retrievals)
-    num.experimental.items = this.run$num.experimental.items
+    item.file                 = as.character(this.run$items)
+    retrieval.file            = as.character(this.run$retrievals)
+    num.experimental.items    = this.run$num.experimental.items
     num.experimental.subjects = this.run$num.experimental.subjects
     
     results = run.model.quietly()
@@ -275,9 +275,6 @@ for (r in 1:total.runs) {
     all.runs[r,]$model = model.result
     all.runs[r,]$model.lower = model.result.lower
     all.runs[r,]$model.upper = model.result.upper
-    
-    print(Sys.time() - start)
-    start = Sys.time()
 }
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
@@ -686,7 +683,7 @@ plot.full.range.no.decay = function() {
 ## plot.best.overall.no.decay.no.mp()
 ## plot.individual.no.decay.no.mp()
 
-plot.best.overall.decay()
+#plot.best.overall.decay()
 #plot.individual.decay()
 #plot.best.overall.decay.no.mp()
 #plot.individual.decay.no.mp()
