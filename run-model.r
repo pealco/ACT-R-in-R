@@ -212,18 +212,9 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     print(paste("Plotting exp",experiment,"condition:",condition,"with items:",correct.item,distractor))
     print(paste(" ... and",num.items,"total items"))
     
-    plot(base.activations[1,] ~ ticks,
-        type="n", #lwd=2,col=clrs[1],
-        main=paste("Mean activation of items,", trials,"trial", 
-        "Exp:", experiment, "Condition:", condition),
-        ylab="Activation", xlab="Time")
-    
-    for (j in 1:length(plotting.items)) {
-        c = plotting.items[j]
-        print(paste("Plotting item",c))
-        
-        lines(base.activations[c,] ~ ticks, type="l", lwd=4,col=clrs[j])  
-    }
+    matplot(ticks, t(base.activations[plotting.items,]), type="l", 
+        main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
+        ylab="Activation", xlab="Time", lwd=4, lty=1)
     
     if (correct.item) {
         ## add a legend
