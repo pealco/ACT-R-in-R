@@ -3,4 +3,4 @@ created	0	300	600	900	1200	1500	1800	2100
 cat	DP	DP	VP	PP	DP	VP	VP	PP
 number	SG	PL	PL	nil	SG	SG	PL	nil
 role	specT	specT	headVP	headPP	compP	headVP	headVP	headPP
-embed	-	+	+	+	+	-	+	+
+embed	0	1	1	1	1	0	1	1
