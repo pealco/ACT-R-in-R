@@ -189,7 +189,9 @@ run.model.quietly = function() {
 plot.activation = function(moments, history, correct.item, distractor, experiment, condition) {
     min.time = 0
     max.time = moments[length(moments)] + 200
-
+    
+    sub = paste("F=", F, " G=", G, " ans=", ans, " mas=", mas, " d=", d, sep="")
+    
     ticks = seq(min.time,max.time,10)    
     base.activations = foreach(t = ticks, .combine="cbind") %dopar% {
         base.levels = compute.base.levels(t)
@@ -208,6 +210,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     
     matplot(ticks, t(base.activations[plotting.items,]), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
+        sub=sub,
         ylab="Activation", xlab="Time", lwd=4, lty=1)
     
     maxb = max(base.activations, na.rm=TRUE)
@@ -231,6 +234,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
 
     matplot(ticks, t(base.activations), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
+        sub=sub,
         ylab="Activation", xlab="Time", lwd=4, lty=1, col=clrs)
 
     legend("top", item.name, 
