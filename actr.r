@@ -29,15 +29,14 @@ compute.base.levels = function(moment) {
 	tjd = tj ^ -d
 	decay = matrix(tjd[tj > 0], nrow=trials, ncol=num.past.retrievals, byrow=TRUE)
 	
-	# compute base level activation for each item (for each trial)
-	base.levels = matrix(nrow=num.items, ncol=trials)
-	for (c in 1:num.items) {
-	  retrievals = past == c                  # boolean matrix
-	  activations = retrievals * decay
-	  b = log(rowSums(activations, na.rm=TRUE))     # sum over all j retrievals
-	  b[is.infinite(b)] = 0                      # don't propagate through infinite values
-	  base.levels[c,] = b
+	base.levels = foreach(c = 1:num.items, .combine="rbind") %do% {
+        retrievals = past == c                      # boolean matrix
+        activations = retrievals * decay
+        b = log(rowSums(activations, na.rm=TRUE))   # sum over all j retrievals
+        b[is.infinite(b)] = 0                       # don't propagate through infinite values
+        b
 	}
+	
 	return(base.levels)
 }
 
