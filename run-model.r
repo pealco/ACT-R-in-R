@@ -66,7 +66,7 @@ run.model = function(quiet=TRUE) {
       
     #print("Starting to run model....")
     ## Read in the item definitions: each item is a feature vector
-    items <<- read.delim(file=item.file,header=FALSE,colClasses="character")
+    items <<- read.delim(file=item.file, header=FALSE, colClasses="character")
     num.columns <<- length(items)
     num.features <<- length(items[,1])-2
     
@@ -174,7 +174,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     sub = paste("F=", F, " G=", G, " ans=", ans, " mas=", mas, " d=", d, sep="")
     
     ticks = seq(min.time,max.time,10)    
-    base.activations = foreach(t = ticks, .combine="cbind") %dopar% {
+    base.activations = foreach(t = ticks, .combine="cbind") %do% {
         base.levels = compute.base.levels(t)
         exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
         activation  = base.levels*exists + 0*!exists
