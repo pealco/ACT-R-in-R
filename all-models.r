@@ -256,7 +256,7 @@ foreach (r = icount(total.runs), .combine="+") %dopar% {
     num.experimental.items    = this.run$num.experimental.items
     num.experimental.subjects = this.run$num.experimental.subjects
     
-    results = run.model(item.file=item.file)
+    results = run.model(run = this.run)
    
     ## now extract the relevant measure
     

@@ -61,7 +61,13 @@ set.parameters = function(p) {
 
 ## RUN THE MODEL given the global parameter settings
 
-run.model = function(quiet=TRUE, item.file) {
+run.model = function(quiet=TRUE, run) {
+
+    item.file                 = as.character(this.run$items)
+    retrieval.file            = as.character(this.run$retrievals)
+    num.experimental.items    = this.run$num.experimental.items
+    num.experimental.subjects = this.run$num.experimental.subjects
+
     trials <<- default.trials
       
     #print("Starting to run model....")
