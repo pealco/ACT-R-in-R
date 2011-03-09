@@ -14,6 +14,9 @@
 #########################################################################################################
 
 library(xtable)
+library(doMC)
+
+registerDoMC()
 
 ## act-r library
 source("actr.r")
@@ -65,7 +68,7 @@ run.model = function(quiet=TRUE) {
         trials <<- default.trials
     }
   
-    print("Starting to run model....")
+    #print("Starting to run model....")
     ## Read in the item definitions: each item is a feature vector
     items <<- read.delim(file=item.file,header=FALSE,colClasses="character")
     num.columns <<- length(items)
@@ -186,34 +189,25 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     min.time = 0
     max.time = moments[length(moments)] + 200
 
-    print("Computing complete history of activation values at times....")
+    print("    Computing complete history of activation values.")
 
     ticks = seq(min.time,max.time,10)
     num.ticks = length(ticks)
-
-    base.activations = matrix(nrow=num.items, ncol=num.ticks)
     
-    ##  First compute the history of activation values at each time point
-    for (j in 1:num.ticks) {
-        t = ticks[j]
-        
-        if (round(t/100)==t/100) {print(t)}
+    base.activations = foreach(t = ticks, .combine="cbind") %dopar% {
         base.levels = compute.base.levels(t)
-        
-        ## make items that don't exist yet have activation of 0
-        exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)    
+        exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
         activation  = base.levels*exists + 0*!exists
-        
-        ## take mean activation over all the monte carlo trials
-        base.activations[,j] = rowMeans(activation)
+        rowMeans(activation)
+        #if (round(t/100)==t/100) {print(t)}
     }
-    
+
     # Plot only correct item and distractor item.
     plotting.items = c(correct.item, distractor)
     clrs = c("black", "red")
     
-    print(paste("Plotting exp",experiment,"condition:",condition,"with items:",correct.item,distractor))
-    print(paste(" ... and",num.items,"total items"))
+    #print(paste("Plotting exp",experiment,"condition:",condition,"with items:",correct.item,distractor))
+    #print(paste(" ... and",num.items,"total items"))
     
     matplot(ticks, t(base.activations[plotting.items,]), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
