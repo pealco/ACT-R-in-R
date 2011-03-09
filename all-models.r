@@ -18,7 +18,6 @@ source("run-model.r")
 
 history = NULL
 
-
 output = function(filename) {
     output_dir = "./output/"
     return(paste(output_dir, filename, sep=""))
@@ -27,11 +26,11 @@ output = function(filename) {
 ## Experiment definitions
 
 bp = list(
-    name = "bp",
+    name = "BPNS",
     description ="Brazilian Portuguese Null Subjects",
     conditions = list(
         list(
-            condition = "Good",
+            condition = "GOOD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
             retrievals = "bp-good-retrievals.txt",
@@ -43,7 +42,7 @@ bp = list(
             critical.retrieval = 2),   # second retrieval is critical
 
         list(
-            condition = "Bad",
+            condition = "BAD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,                       
             retrievals = "bp-bad-retrievals.txt",
@@ -55,7 +54,7 @@ bp = list(
             critical.retrieval = 2),   
 
         list(
-            condition = "Interferer",
+            condition = "INTERFERER",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
             retrievals = "bp-interferer-retrievals.txt",
@@ -76,15 +75,14 @@ num.experiments = length(experiments)
 
 
 ## number of monte carlo trials per experiment
-default.trials = 1000
-simulated.experiments = 50
+default.trials = 5000 #1000
 
 ## Discrete parameter space to search.  Each parameter now contains a list
 ## of possible values rather than a single value.  
 
 ## Latency factor
-F = c(1)
-#F = c(0.1, 0.15, 0.2)
+#F = c(1)
+F = c(0.85)
 
 
 ## Extra category penalty
@@ -92,23 +90,23 @@ cat.penalty = c(-999)
 
 
 ## Total source activation
-#G = c(0.7, 0.8, 1.0)
+#G = c(1.0)
 G = c(1.0)
 
-
 ## Activation noise parameter for logistic distribution
-ans  = c(0.15)  #, 0.2)
+#ans  = c(0.15)
+ans  = c(0.45, 0.6, 0.1)
 
 ## Fan parameter
-mas = c(1.5)  #, 2.0)
+#mas = c(1.5)
+mas = c(1.5, 2.0)
 
 ## Base level decay parameter
-#d = c(0.001,0.5)
-
 d = c(0.5)
 
 ## Match penalty
-match.penalty = c(0)
+#match.penalty = c(-1, -0.7, -0.4)
+match.penalty = seq(-1, -0.4, 0.1)
 ## match.penalty = c(0, -0.1)
 
 ## Following are non-ACT-R modifications that we turn off by default
@@ -196,13 +194,16 @@ colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", 
 all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs))
 
 ## Loop over all runs and run the models
+start = Sys.time()
 for (r in 1:total.runs) {
-    pdf(file=output(paste(r, "-activation-plots.pdf", sep="")), width=11, height=5)
-    output.file = output(paste(r, "-output.html", sep=""))
     print(paste("Executing run #",r,"of",total.runs))
     
     ## select out row corresponding to this run
-    this.run = all.runs[r,]      
+    this.run = all.runs[r,]
+    
+    ## set output file name
+    filename.prefix = paste(this.run$experiment, "-", this.run$condition, "-", r, sep="")
+    output.file = output(paste(filename.prefix, "-output.html", sep=""))
     
     ## now set the model parameters according to this combination of values
     set.parameters(this.run[1:num.parameters])
@@ -219,29 +220,33 @@ for (r in 1:total.runs) {
     ## plot the activation profiles for the critical and distractor items
     clrs = c("black", "green","blue","orange", "brown", "red", "purple")
     
-    plot.activation(moments, history, this.run$correct.item, this.run$distractor.item,
-                          this.run$experiment, this.run$condition)
     
-    
+
+    pdf(file = output(paste(filename.prefix, "-activation-plots.pdf", sep="")), width=11, height=5)
+    plot.activation(moments, history, this.run$correct.item, this.run$distractor.item, this.run$experiment, this.run$condition)
+    dev.off()
+
     ## now extract the relevant measure
     
     if (this.run$measure=="percent error") {
-      crit.ret = results[[this.run$critical.retrieval]]
-      model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100
-      model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100
-      model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100        
+        crit.ret = results[[this.run$critical.retrieval]]
+        model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100
+        model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100
+        model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100        
     }
     else {
-      model.result = NA
-      model.result.lower = NA
-      model.result.upper = NA        
-      print(paste("The", this.run$measure, "measure is not yet implemented."))
+        model.result = NA
+        model.result.lower = NA
+        model.result.upper = NA        
+        print(paste("The", this.run$measure, "measure is not yet implemented."))
     }
     all.runs[r,]$model = model.result
     all.runs[r,]$model.lower = model.result.lower
     all.runs[r,]$model.upper = model.result.upper
     
-    dev.off()
+    
+    print(Sys.time() - start)
+    start = Sys.time()
 }
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
@@ -285,13 +290,13 @@ colnames(aggregate.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", 
 
 param.results = cbind(aggregate.parameter.matrix, param.results)
 
-r.melt = melt(param.results,measure.var=c("r2","mse","smse","spearman"),variable="variable")
+r.melt = melt(param.results, measure.var=c("r2","mse","smse","spearman"), variable="variable")
 
-r2.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "r2"))
-mse.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "mse"))
-spearman.summary = cast(r.melt, combo ~ .,mean,subset = (variable == "spearman"))
+r2.summary       = cast(r.melt, combo ~ ., mean, subset = (variable == "r2"))
+mse.summary      = cast(r.melt, combo ~ ., mean, subset = (variable == "mse"))
+spearman.summary = cast(r.melt, combo ~ ., mean, subset = (variable == "spearman"))
 
-combo.summary = cbind(p.matrix,r2.summary[2],mse.summary[2],spearman.summary[2])
+combo.summary = cbind(p.matrix, r2.summary[2], mse.summary[2], spearman.summary[2])
 
 colnames(combo.summary) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
                              "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness","r2","mse","spearman")
@@ -304,10 +309,10 @@ plot.experiment = function(exp, combo) {
     index = seq(from=combo, to=total.runs, by=num.combinations)
     runs = all.runs[index,]
     runs.exp = runs[runs$experiment==exp,]
-    ht = as.matrix(cbind(runs.exp$data, runs.exp$model))
+    ht = as.matrix(runs.exp$model)
 
-#   ht.lower =as.matrix(cbind(runs.exp$data.lower, runs.exp$model.lower))
-#   ht.upper =as.matrix(cbind(runs.exp$data.upper, runs.exp$model.upper))
+    ht.lower =as.matrix(runs.exp$model.lower)
+    ht.upper =as.matrix(runs.exp$model.upper)
 
     param.names = colnames(all.runs)[1:num.parameters]
     param.values = runs[1,1:num.parameters]
@@ -315,14 +320,13 @@ plot.experiment = function(exp, combo) {
     barplot2(
         height=ht,
         bty="n",
-#       ci.l = ht.lower,
-#       ci.u = ht.upper,
-#       ci.color="gray40",
-#       plot.ci=TRUE,
-        plot.ci=FALSE,
+        ci.l = ht.lower,
+        ci.u = ht.upper,
+        ci.color="gray40",
+        plot.ci=TRUE,
         col=rev(grey.colors(length(runs.exp$condition))),
         ##  legend.text=runs.exp$condition,
-        names=c("Data","Retrieval Interference Model"),
+        names=c("Retrieval Interference Model"),
         beside=TRUE,
         space = c(0.1, 1),
         ylim = c(0,50),
@@ -335,7 +339,7 @@ plot.experiment = function(exp, combo) {
         )
   
   axis(1,labels=FALSE,tcl=0)  ## zero tick length
-  legend(x="topright",
+  legend(x="topleft",
          legend=runs.exp$condition,
          fill=rev(grey.colors(length(runs.exp$condition))),
          bty="n")
@@ -354,7 +358,6 @@ get.description = function(exp) {
         if (experiments[[i]]$name == exp) {
             return(experiments[[i]]$description)
         }
-            
     }
     return("No description")
 }
@@ -380,14 +383,7 @@ plot.best.overall.no.decay = function() {
         model.points = c(model.points, plotted.points[,2])
         par(pin=c(3.5,3.5))    
     }
- 
-  
-    plot(model.points ~ data.points,
-        xlim=c(0,30),ylim=c(0,30),
-        main="Model vs. Data Across 14 Conditions",
-        xlab ="Data", ylab="Model")
-    lines(x=c(0,30), y=c(0,30),lty=3)
-    dev.off()
+
 }
 
 
@@ -490,16 +486,16 @@ plot.best.overall.decay = function() {
         exp = experiments[[e]]$name
         this.exp = param.results[(param.results$experiment==exp) & (param.results$d==0.5),]
         plotted.points = plot.experiment(exp, c)
-        data.points = c(data.points, plotted.points[,1])
-        model.points = c(model.points, plotted.points[,2])
+        model.points = c(model.points, plotted.points)
         par(pin=c(3.5,3.5))    
     }
  
-    plot(model.points ~ data.points,
-        main="Model vs. Data Across 14 Conditions",
-        xlim=c(0,30),ylim=c(0,30),
-        xlab ="Data", ylab="Model")
-    lines(x=c(0,30), y=c(0,30),lty=3)
+    #plot(model.points ~ data.points,
+    #    main="Model vs. Data Across 14 Conditions",
+    #    xlim=c(0,30),ylim=c(0,30),
+    #    xlab ="Data", ylab="Model")
+    #lines(x=c(0,30), y=c(0,30),lty=3)
+    
     dev.off()
 }
 
@@ -523,11 +519,12 @@ plot.best.overall.decay.no.mp = function() {
         par(pin=c(3.5,3.5))    
     }
  
-    plot(model.points ~ data.points,
-        xlim=c(0,30),ylim=c(0,30),
-        main="Model vs. Data Across 14 Conditions",
-        xlab ="Data", ylab="Model")
-    lines(x=c(0,30), y=c(0,30),lty=3)
+    #plot(model.points ~ data.points,
+    #    xlim=c(0,30),ylim=c(0,30),
+    #    main="Model vs. Data Across 14 Conditions",
+    #    xlab ="Data", ylab="Model")
+    #lines(x=c(0,30), y=c(0,30),lty=3)
+    
     dev.off()
 }
 
@@ -544,16 +541,16 @@ plot.individual.decay = function() {
         m = which.min(this.exp$mse)
         c = this.exp$combo[m]
         plotted.points = plot.experiment(exp, c)
-        data.points = c(data.points, plotted.points[,1])
-        model.points = c(model.points, plotted.points[,2])
+        model.points = c(model.points, plotted.points)
         par(pin=c(3.5,3.5))        
     }
 
-    plot(model.points ~ data.points,
-        xlim=c(0,30),ylim=c(0,30),
-        main="Model vs. Data Across 14 Conditions",
-        xlab ="Data", ylab="Model")
-    lines(x=c(0,30), y=c(0,30),lty=3)
+    #plot(model.points ~ data.points,
+    #    xlim=c(0,30),ylim=c(0,30),
+    #    main="Model vs. Data Across 14 Conditions",
+    #    xlab ="Data", ylab="Model")
+    #lines(x=c(0,30), y=c(0,30),lty=3)
+    
     dev.off()
 }
   
@@ -575,11 +572,12 @@ plot.individual.decay.no.mp = function() {
         par(pin=c(3.5,3.5))        
     }
 
-    plot(model.points ~ data.points,
-        xlim=c(0,30),ylim=c(0,30),
-        main="Model vs. Data Across 14 Conditions",
-        xlab ="Data", ylab="Model")
-    lines(x=c(0,30), y=c(0,30),lty=3)
+    #plot(model.points ~ data.points,
+    #    xlim=c(0,30),ylim=c(0,30),
+    #    main="Model vs. Data Across 14 Conditions",
+    #    xlab ="Data", ylab="Model")
+    #lines(x=c(0,30), y=c(0,30),lty=3)
+    
     dev.off()
 }
 
@@ -659,8 +657,8 @@ plot.full.range.no.decay = function() {
 
 plot.best.overall.decay()
 plot.individual.decay()
-plot.best.overall.decay.no.mp()
-plot.individual.decay.no.mp()
+#plot.best.overall.decay.no.mp()
+#plot.individual.decay.no.mp()
 
 ##plot.full.range.no.decay()
 plot.full.range.decay()
