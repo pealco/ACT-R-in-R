@@ -216,14 +216,9 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     matplot(ticks, t(base.activations[plotting.items,]), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
         ylab="Activation", xlab="Time", lwd=4, lty=1)
-    
-    if (correct.item) {
-        ## add a legend
-        width = max.time - min.time
-        height = max(base.activations)
-        legend(0.5*width+min.time, height-0.5, c("Head NP","Distractor NP"), lty=1,lwd=4,bty="n",
-             cex=1,
-             col = clrs[1:2],)
+
+    legend("top", c("Head NP","Distractor NP"), 
+        lty=1, lwd=4, bty="n", cex=1, col = clrs[1:2],)
     }
     
     # Plot all items.
@@ -236,10 +231,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     matplot(ticks, t(base.activations), type="l", 
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
         ylab="Activation", xlab="Time", lwd=4, lty=1, col=clrs)
-    
-    width = max.time - min.time
-    height = max(base.activations)
-    legend("top", item.name, lty=1,lwd=4,bty="n",
-           cex=1,
-           col = clrs[1:num.items],)
+
+    legend("top", item.name, 
+        lty=1, lwd=4, bty="n", cex=1, col = clrs[1:num.items],)
 }
