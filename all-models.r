@@ -277,61 +277,63 @@ foreach (r = icount(total.runs), .combine="+") %dopar% {
     all.runs[r,]$model.upper = model.result.upper
 }
 
+print(all.runs)
+
 ## Compute MSE and R^2 for each unique combination of parameter settings
 
-param.results = data.frame(experiment = rep(NA,num.combinations*num.experiments),
-                            combo     = rep(NA,num.combinations*num.experiments),
-                            r2        = rep(NA,num.combinations*num.experiments),
-                            mse       = rep(NA,num.combinations*num.experiments),
-                            smse      = rep(NA,num.combinations*num.experiments)
-                            )
-
-print("Computing aggregate model fits for each unique parameter setting....")
-
-i = 1
-for (e in 1:num.experiments) {
-    exp = experiments[[e]]$name
-  
-    for (j in 1:num.combinations) {
-        print(paste("    parameter setting #",j,"of",num.combinations))
-        index = seq(from=j, to=total.runs, by=num.combinations)
-        runs = all.runs[index,]
-        runs.exp = runs[runs$experiment==exp,]
-        param.results$combo[i] = j
-        param.results$experiment[i] = exp
-        
-        d = runs.exp$data
-        m = runs.exp$model
-        
-        param.results$r2[i] = cor(d, m)^2
-        param.results$spearman[i] = cor(d, m, method="spearman")
-        param.results$mse[i] = mean((d - m)^2)
-        param.results$smse[i] = sqrt(param.results$mse[i])
-        i = i + 1
-    }
-}
-
-aggregate.parameter.matrix = matrix(data=t(p.matrix), nrow=num.combinations*num.experiments,
-                                ncol=num.params, byrow=TRUE)
-colnames(aggregate.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
-                                          "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness")
-
-param.results = cbind(aggregate.parameter.matrix, param.results)
-
-r.melt = melt(param.results, measure.var=c("r2","mse","smse","spearman"), variable="variable")
-
-r2.summary       = cast(r.melt, combo ~ ., mean, subset = (variable == "r2"))
-mse.summary      = cast(r.melt, combo ~ ., mean, subset = (variable == "mse"))
-spearman.summary = cast(r.melt, combo ~ ., mean, subset = (variable == "spearman"))
-
-combo.summary = cbind(p.matrix, r2.summary[2], mse.summary[2], spearman.summary[2])
-
-colnames(combo.summary) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
-                             "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness","r2","mse","spearman")
-
-combo.summary = as.data.frame(combo.summary)
-
-combo.summary$combo = seq(1:length(combo.summary[,1]))
+#param.results = data.frame(experiment = rep(NA,num.combinations*num.experiments),
+#                            combo     = rep(NA,num.combinations*num.experiments),
+#                            r2        = rep(NA,num.combinations*num.experiments),
+#                            mse       = rep(NA,num.combinations*num.experiments),
+#                            smse      = rep(NA,num.combinations*num.experiments)
+#                            )
+#
+#print("Computing aggregate model fits for each unique parameter setting....")
+#
+#i = 1
+#for (e in 1:num.experiments) {
+#    exp = experiments[[e]]$name
+#  
+#    for (j in 1:num.combinations) {
+#        print(paste("    parameter setting #",j,"of",num.combinations))
+#        index = seq(from=j, to=total.runs, by=num.combinations)
+#        runs = all.runs[index,]
+#        runs.exp = runs[runs$experiment==exp,]
+#        param.results$combo[i] = j
+#        param.results$experiment[i] = exp
+#        
+#        d = runs.exp$data
+#        m = runs.exp$model
+#        
+#        param.results$r2[i] = cor(d, m)^2
+#        param.results$spearman[i] = cor(d, m, method="spearman")
+#        param.results$mse[i] = mean((d - m)^2)
+#        param.results$smse[i] = sqrt(param.results$mse[i])
+#        i = i + 1
+#    }
+#}
+#
+#aggregate.parameter.matrix = matrix(data=t(p.matrix), nrow=num.combinations*num.experiments,
+#                                ncol=num.params, byrow=TRUE)
+#colnames(aggregate.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
+#                                          "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness")
+#
+#param.results = cbind(aggregate.parameter.matrix, param.results)
+#
+#r.melt = melt(param.results, measure.var=c("r2","mse","smse","spearman"), variable="variable")
+#
+#r2.summary       = cast(r.melt, combo ~ ., mean, subset = (variable == "r2"))
+#mse.summary      = cast(r.melt, combo ~ ., mean, subset = (variable == "mse"))
+#spearman.summary = cast(r.melt, combo ~ ., mean, subset = (variable == "spearman"))
+#
+#combo.summary = cbind(p.matrix, r2.summary[2], mse.summary[2], spearman.summary[2])
+#
+#colnames(combo.summary) = c("cat.penalty", "F", "G", "ans", "mas", "d", "match.penalty", "VAR.fan",
+#                             "var.mismatch.penalty", "modulate.by.distinct", "distinctiveness","r2","mse","spearman")
+#
+#combo.summary = as.data.frame(combo.summary)
+#
+#combo.summary$combo = seq(1:length(combo.summary[,1]))
 
 #plot.experiment = function(exp, combo) {
 #    index = seq(from=combo, to=total.runs, by=num.combinations)
