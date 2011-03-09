@@ -257,17 +257,7 @@ for (r in 1:total.runs) {
     num.experimental.subjects = this.run$num.experimental.subjects
     
     results = run.model.quietly()
-    #results = run.model(quiet=FALSE)
-    
-    ## plot the activation profiles for the critical and distractor items
-    clrs = c("black", "green","blue","orange", "brown", "red", "purple")
-    
-    
-
-    pdf(file = output(paste(filename.prefix, "-activation-plots.pdf", sep="")), width=11, height=5)
-    plot.activation(moments, history, this.run$correct.item, this.run$distractor.item, this.run$experiment, this.run$condition)
-    dev.off()
-
+   
     ## now extract the relevant measure
     
     if (this.run$measure=="percent error") {
@@ -285,7 +275,6 @@ for (r in 1:total.runs) {
     all.runs[r,]$model = model.result
     all.runs[r,]$model.lower = model.result.lower
     all.runs[r,]$model.upper = model.result.upper
-    
     
     print(Sys.time() - start)
     start = Sys.time()
@@ -698,9 +687,9 @@ plot.full.range.no.decay = function() {
 ## plot.individual.no.decay.no.mp()
 
 plot.best.overall.decay()
-plot.individual.decay()
+#plot.individual.decay()
 #plot.best.overall.decay.no.mp()
 #plot.individual.decay.no.mp()
 
 ##plot.full.range.no.decay()
-plot.full.range.decay()
+#plot.full.range.decay()
