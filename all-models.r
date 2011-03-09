@@ -31,8 +31,8 @@ bp_embed = list(
     conditions = list(
         list(
             condition = "GOOD",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,
             retrievals = "NS_with_embed/bp-good-retrievals.txt",
             items      = "NS_with_embed/bp-good-items.txt",
             data = 0.011,
@@ -43,8 +43,8 @@ bp_embed = list(
 
         list(
             condition = "BAD",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,                       
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,                       
             retrievals = "NS_with_embed/bp-bad-retrievals.txt",
             items      = "NS_with_embed/bp-bad-items.txt",
             data = 0.012,
@@ -55,8 +55,8 @@ bp_embed = list(
 
         list(
             condition = "INTERFERER",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,
             retrievals = "NS_with_embed/bp-interferer-retrievals.txt",
             items      = "NS_with_embed/bp-interferer-items.txt",
             data = 0.013,
@@ -73,8 +73,8 @@ bp_no_embed = list(
     conditions = list(
         list(
             condition = "GOOD",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,
             retrievals = "NS_without_embed/bp-good-retrievals.txt",
             items      = "NS_without_embed/bp-good-items.txt",
             data = 0.011,
@@ -85,8 +85,8 @@ bp_no_embed = list(
 
         list(
             condition = "BAD",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,                       
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,                       
             retrievals = "NS_without_embed/bp-bad-retrievals.txt",
             items      = "NS_without_embed/bp-bad-items.txt",
             data = 0.012,
@@ -97,8 +97,8 @@ bp_no_embed = list(
 
         list(
             condition = "INTERFERER",
-            num.experimental.subjects = 45,
-            num.experimental.items = 18,
+            num.experimental.subjects = NA,
+            num.experimental.items = NA,
             retrievals = "NS_without_embed/bp-interferer-retrievals.txt",
             items      = "NS_without_embed/bp-interferer-items.txt",
             data = 0.013,
@@ -237,7 +237,7 @@ all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs))
 
 ## Loop over all runs and run the models
 #start = Sys.time()
-foreach (r = icount(total.runs), .combine="+") %dopar% {
+for (r in 1:total.runs) {
     print(paste("Executing run #",r,"of",total.runs))
     
     ## select out row corresponding to this run
@@ -256,28 +256,24 @@ foreach (r = icount(total.runs), .combine="+") %dopar% {
     num.experimental.items    = this.run$num.experimental.items
     num.experimental.subjects = this.run$num.experimental.subjects
     
-    results = run.model(run = this.run)
+    results = run.model()
+    print(results)
    
     ## now extract the relevant measure
     
-    if (this.run$measure=="percent error") {
-        crit.ret = results[[this.run$critical.retrieval]]
-        model.result = crit.ret$retrieval.prob[this.run$distractor.item] * 100
-        model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100
-        model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100        
-    }
-    else {
-        model.result = NA
-        model.result.lower = NA
-        model.result.upper = NA        
-        print(paste("The", this.run$measure, "measure is not yet implemented."))
-    }
+    crit.ret           = results[[this.run$critical.retrieval]]
+    model.result       = crit.ret$retrieval.prob[this.run$distractor.item] * 100
+    model.result.lower = crit.ret$retrieval.prob.lower[this.run$distractor.item] * 100
+    model.result.upper = crit.ret$retrieval.prob.upper[this.run$distractor.item] * 100
+
     all.runs[r,]$model = model.result
     all.runs[r,]$model.lower = model.result.lower
     all.runs[r,]$model.upper = model.result.upper
+    
 }
 
-print(all.runs)
+print(dim(all.runs))
+
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
 

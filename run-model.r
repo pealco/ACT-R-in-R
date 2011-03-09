@@ -61,12 +61,7 @@ set.parameters = function(p) {
 
 ## RUN THE MODEL given the global parameter settings
 
-run.model = function(quiet=TRUE, run) {
-
-    item.file                 = as.character(run$items)
-    retrieval.file            = as.character(run$retrievals)
-    num.experimental.items    = run$num.experimental.items
-    num.experimental.subjects = run$num.experimental.subjects
+run.model = function(quiet=TRUE) {
 
     trials <<- default.trials
       
@@ -180,7 +175,7 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
     sub = paste("F=", F, " G=", G, " ans=", ans, " mas=", mas, " d=", d, sep="")
     
     ticks = seq(min.time,max.time,10)    
-    base.activations = foreach(t = ticks, .combine="cbind") %do% {
+    base.activations = foreach(t = ticks, .combine="cbind") %dopar% {
         base.levels = compute.base.levels(t)
         exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
         activation  = base.levels*exists + 0*!exists
