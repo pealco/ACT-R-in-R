@@ -36,7 +36,7 @@ bp = list(
             num.experimental.items = 18,
             retrievals = "bp-good-retrievals.txt",
             items      = "bp-good-items.txt",
-            data = 0,
+            data = 0.011,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -48,7 +48,7 @@ bp = list(
             num.experimental.items = 18,                       
             retrievals = "bp-bad-retrievals.txt",
             items      = "bp-bad-items.txt",
-            data = 0,
+            data = 0.012,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -60,14 +60,14 @@ bp = list(
             num.experimental.items = 18,
             retrievals = "bp-interferer-retrievals.txt",
             items      = "bp-interferer-items.txt",
-            data = 0,
+            data = 0.013,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
             critical.retrieval = 2)
         )
     )
-
+# Entries for data cannot all be equal.
 
 
 ## Complete list of experiments
@@ -115,7 +115,7 @@ match.penalty = c(0)
 var.mismatch.penalty = c(FALSE)
 VAR.fan = c(0)    # additional fan associated with VAR retrieval cues
 modulate.by.distinct = c(FALSE)
-distinctiveness = c(0)                # Note that the quantitative parameter has no
+distinctiveness = c(0)                  # Note that the quantitative parameter has no
                                         # effect when modulate.by.distinct is FALSE. So this is some  wasted
                                         # effort in the simple code below.
 
