@@ -63,10 +63,10 @@ set.parameters = function(p) {
 
 run.model = function(quiet=TRUE, run) {
 
-    item.file                 = as.character(this.run$items)
-    retrieval.file            = as.character(this.run$retrievals)
-    num.experimental.items    = this.run$num.experimental.items
-    num.experimental.subjects = this.run$num.experimental.subjects
+    item.file                 = as.character(run$items)
+    retrieval.file            = as.character(run$retrievals)
+    num.experimental.items    = run$num.experimental.items
+    num.experimental.subjects = run$num.experimental.subjects
 
     trials <<- default.trials
       
