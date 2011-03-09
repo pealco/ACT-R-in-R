@@ -221,7 +221,6 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
 
     legend("top", c("Head NP","Distractor NP"), 
         lty=1, lwd=4, bty="n", cex=1, col = clrs[1:2],)
-    }
     
     # Plot all items.
     plotting.items = 1:num.items
