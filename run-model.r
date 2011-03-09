@@ -61,7 +61,7 @@ set.parameters = function(p) {
 
 ## RUN THE MODEL given the global parameter settings
 
-run.model = function(quiet=TRUE) {
+run.model = function(quiet=TRUE, item.file) {
     trials <<- default.trials
       
     #print("Starting to run model....")
