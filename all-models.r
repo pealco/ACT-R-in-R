@@ -25,16 +25,16 @@ output = function(filename) {
 
 ## Experiment definitions
 
-bp = list(
-    name = "BPNS",
+bp_embed = list(
+    name = "BPNS_embed",
     description ="Brazilian Portuguese Null Subjects",
     conditions = list(
         list(
             condition = "GOOD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
-            retrievals = "bp-good-retrievals.txt",
-            items      = "bp-good-items.txt",
+            retrievals = "NS_with_embed/bp-good-retrievals.txt",
+            items      = "NS_with_embed/bp-good-items.txt",
             data = 0.011,
             measure="percent error",
             correct.item = 1,
@@ -45,8 +45,8 @@ bp = list(
             condition = "BAD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,                       
-            retrievals = "bp-bad-retrievals.txt",
-            items      = "bp-bad-items.txt",
+            retrievals = "NS_with_embed/bp-bad-retrievals.txt",
+            items      = "NS_with_embed/bp-bad-items.txt",
             data = 0.012,
             measure="percent error",
             correct.item = 1,
@@ -57,8 +57,50 @@ bp = list(
             condition = "INTERFERER",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
-            retrievals = "bp-interferer-retrievals.txt",
-            items      = "bp-interferer-items.txt",
+            retrievals = "NS_with_embed/bp-interferer-retrievals.txt",
+            items      = "NS_with_embed/bp-interferer-items.txt",
+            data = 0.013,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2)
+        )
+    )
+
+bp_no_embed = list(
+    name = "BPNS_no_embed",
+    description ="Brazilian Portuguese Null Subjects",
+    conditions = list(
+        list(
+            condition = "GOOD",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "NS_without_embed/bp-good-retrievals.txt",
+            items      = "NS_without_embed/bp-good-items.txt",
+            data = 0.011,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   # second retrieval is critical
+
+        list(
+            condition = "BAD",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,                       
+            retrievals = "NS_without_embed/bp-bad-retrievals.txt",
+            items      = "NS_without_embed/bp-bad-items.txt",
+            data = 0.012,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   
+
+        list(
+            condition = "INTERFERER",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "NS_without_embed/bp-interferer-retrievals.txt",
+            items      = "NS_without_embed/bp-interferer-items.txt",
             data = 0.013,
             measure="percent error",
             correct.item = 1,
@@ -70,7 +112,7 @@ bp = list(
 
 
 ## Complete list of experiments
-experiments = list(bp)
+experiments = list(bp_embed, bp_no_embed)
 num.experiments = length(experiments)
 
 
