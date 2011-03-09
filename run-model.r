@@ -62,12 +62,8 @@ set.parameters = function(p) {
 ## RUN THE MODEL given the global parameter settings
 
 run.model = function(quiet=TRUE) {
-    if (!(is.na(num.experimental.items) | is.na(num.experimental.subjects))) {
-        trials <<- simulated.experiments * num.experimental.items * num.experimental.subjects
-    } else {
-        trials <<- default.trials
-    }
-  
+    trials <<- default.trials
+      
     #print("Starting to run model....")
     ## Read in the item definitions: each item is a feature vector
     items <<- read.delim(file=item.file,header=FALSE,colClasses="character")
@@ -90,7 +86,7 @@ run.model = function(quiet=TRUE) {
     if (!quiet) {
     
         ## Print out header
-        write(paste("<HR SIZE=8 NOSHADE><h2>Item file: ",item.file,"</h2>"),file=output.file)
+        write(paste("<HR SIZE=8 NOSHADE><h2>Item file: ",item.file,"</h2>"), file=output.file)
         write(paste("<HR SIZE=8 NOSHADE><h2>Retrieval file: ",retrieval.file,"</h2>"),file=output.file,append=TRUE)
         
         ## Print out the set of items
@@ -125,18 +121,11 @@ run.model = function(quiet=TRUE) {
         moment = as.integer(retrievals[r,1])
     
         if (!quiet) {
-            print("",quote=FALSE)
-            print ("=========================================================================================",quote=FALSE)
-            print(paste("Retrieving at",moment,"ms, with cues:"),quote=FALSE)
-            print ("=========================================================================================",quote=FALSE)
-            
             write(file=output.file,paste("<h3>Retrieval at ",moment,"ms</h3>",sep=""),append=TRUE) 
-            
             
             print.cues = as.matrix(cues)
             colnames(print.cues) = c("value")
             rownames(print.cues) = items[3:(num.features+2),1]
-            print(print.cues,quote=FALSE)
             cues.tab = xtable(print.cues,caption = paste("Cues at ",moment,"ms",sep=""))
             
             write(file=output.file,"<TABLE border=0 cellspacing=30><TD>",append=TRUE)
@@ -149,14 +138,12 @@ run.model = function(quiet=TRUE) {
         complete.results = append(complete.results, list(summary))
           
         if (!quiet) {
-            print(summary,quote=FALSE)
-            
             rtable = xtable(summary,caption=paste("Result at ",moment,"ms",sep=""))
             print(file=output.file, rtable, caption.placement="top",append=TRUE,type="html")
             write(file=output.file,"</TD></TABLE><HR size=5 noshade>",append=TRUE)
             
-            params = rbind(c("Latency factor", "Total source activation", "Activation noise", "Fan parameter", "Base level decay"), 
-                            c(F, G, ans, mas, d))
+            params = t(as.matrix(c(F, G, ans, mas, d)))
+            colnames(params) = c("Latency factor", "Total source activation", "Activation noise", "Fan parameter", "Base level decay")
             params.table = xtable(params)
             print(file=output.file, params.table, append=TRUE, type="html")
         }      
@@ -166,15 +153,9 @@ run.model = function(quiet=TRUE) {
           
         if (!quiet) {
             for (c in 1:num.items) {
-                hist(main = paste("Retrieval time distribution for item",item.name[c]),
-                ##           result$final.latency[c, result$final.latency[c,]<1200])
-                result$final.latency)
+                hist(result$final.latency[c, ], main = paste("Retrieval time distribution for item",item.name[c]))
             }
         }
-    }
-    
-    if (!quiet) {
-        dev.off()
     }
     return(complete.results)
 }
@@ -212,17 +193,6 @@ plot.activation = function(moments, history, correct.item, distractor, experimen
         main=paste("Mean activation of items,", trials,"trial", "Exp:", experiment, "Condition:", condition),
         sub=sub,
         ylab="Activation", xlab="Time", lwd=4, lty=1)
-    
-    maxb = max(base.activations, na.rm=TRUE)
-    minb = min(base.activations, na.rm=TRUE)
-    
-    for (m in creation.moment) {
-      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=2, col="darkgreen")
-    }
-
-    for (m in setdiff(moments, creation.moment)) {
-      lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=4, col="red")
-    }
 
     legend("top", c("Head NP","Distractor NP"), 
         lty=1, lwd=4, bty="n", cex=1, col = clrs[1:2],)
