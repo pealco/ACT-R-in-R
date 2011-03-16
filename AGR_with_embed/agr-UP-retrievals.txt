@@ -1,0 +1,5 @@
+moment	1050	1950
+cat	DP	DP
+number	PL	PL
+role	specT	specT
+embed	1	0

@@ -2,6 +2,8 @@
 
 # The act-r random logistic function.
 
+library(foreach)
+
 actr.logis = function(trials, alpha, beta) {
     r1 = runif(trials, 0, 1)
     r2 = runif(trials, 0, 1)
@@ -13,31 +15,31 @@ actr.logis = function(trials, alpha, beta) {
 # identifies the winning item for each trial.
 
 compute.base.levels = function(moment) {
-	if (d == FALSE) {
-		base.levels = matrix(0, nrow=num.items, ncol=trials)
-		return(base.levels)
-	}
-	
-	# time since last retrieval for each retrieval (converted from milliseconds)
-	tj = (moment/1000) - (moments/1000)
-	
-	# just pay attention to past, not future
-	past = history[, tj > 0]
-	num.past.retrievals = sum(tj > 0)
-	
-	# the decay function
-	tjd = tj ^ -d
-	decay = matrix(tjd[tj > 0], nrow=trials, ncol=num.past.retrievals, byrow=TRUE)
-	
-	base.levels = foreach(c = 1:num.items, .combine="rbind") %do% {
+    if (d == FALSE) {
+        base.levels = matrix(0, nrow=num.items, ncol=trials)
+        return(base.levels)
+    }
+    
+    # time since last retrieval for each retrieval (converted from milliseconds)
+    tj = (moment/1000) - (moments/1000)
+    
+    # just pay attention to past, not future
+    past = history[, tj > 0]
+    num.past.retrievals = sum(tj > 0)
+    
+    # the decay function
+    tjd = tj ^ -d
+    decay = matrix(tjd[tj > 0], nrow=trials, ncol=num.past.retrievals, byrow=TRUE)
+    
+    base.levels = foreach(c = 1:num.items, .combine="rbind") %do% {
         retrievals = past == c                      # boolean matrix
         activations = retrievals * decay
         b = log(rowSums(activations, na.rm=TRUE))   # sum over all j retrievals
         b[is.infinite(b)] = 0                       # don't propagate through infinite values
         b
-	}
-	
-	return(base.levels)
+    }
+    
+    return(base.levels)
 }
 
 
@@ -165,19 +167,18 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
       experiments = rep(1:trials, each=num.experimental.subjects, length.out=length(subject.means[, 1]))
       experiment.means = aggregate(subject.means, by=list(experiments), FUN=mean)
       
+      CI = 2.0
+      
       retrieval.prob.lower = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
                                 FUN=function(x) {
-#                                  return(quantile(x, probs=c(0.025)))
-                                  return(quantile(x, probs=c(0.1586)))                                  
+                                  return(quantile(x, probs=pnorm(-CI)))                                  
                                 })
       
       retrieval.prob.upper = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
                                 FUN=function(x) {
-#                                  return(quantile(x, probs=c(0.975)))
-                                  return(quantile(x, probs=c(0.8413)))                                  
+                                  return(quantile(x, probs=pnorm(CI)))                                  
                                 })
     }
-
     
     # probability of retrieval
     retrieval.prob = counts / trials
@@ -193,7 +194,7 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
                            activation.mean=c(activation.mean, NA),
                            activation.sd=c(activation.sd, NA))
 
-    return(list(summary=summary, winner=winner, latency.mean=latency.mean, final.latency=final.latency))    
+    return(list(summary=summary, winner=winner, latency.mean=latency.mean, final.latency=final.latency, winner.latency=winner.latency))    
 }
 
 
