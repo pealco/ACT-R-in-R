@@ -25,16 +25,16 @@ output = function(filename) {
 
 ## Experiment definitions
 
-bp = list(
-    name = "BPNS",
+bp_embed = list(
+    name = "BPNS_embed",
     description ="Brazilian Portuguese Null Subjects",
     conditions = list(
         list(
             condition = "GOOD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
-            retrievals = "bp-good-retrievals.txt",
-            items      = "bp-good-items.txt",
+            retrievals = "NS_with_embed/bp-good-retrievals.txt",
+            items      = "NS_with_embed/bp-good-items.txt",
             data = 0.011,
             measure="percent error",
             correct.item = 1,
@@ -45,8 +45,8 @@ bp = list(
             condition = "BAD",
             num.experimental.subjects = 45,
             num.experimental.items = 18,                       
-            retrievals = "bp-bad-retrievals.txt",
-            items      = "bp-bad-items.txt",
+            retrievals = "NS_with_embed/bp-bad-retrievals.txt",
+            items      = "NS_with_embed/bp-bad-items.txt",
             data = 0.012,
             measure="percent error",
             correct.item = 1,
@@ -57,8 +57,50 @@ bp = list(
             condition = "INTERFERER",
             num.experimental.subjects = 45,
             num.experimental.items = 18,
-            retrievals = "bp-interferer-retrievals.txt",
-            items      = "bp-interferer-items.txt",
+            retrievals = "NS_with_embed/bp-interferer-retrievals.txt",
+            items      = "NS_with_embed/bp-interferer-items.txt",
+            data = 0.013,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2)
+        )
+    )
+
+bp_no_embed = list(
+    name = "BPNS_no_embed",
+    description ="Brazilian Portuguese Null Subjects",
+    conditions = list(
+        list(
+            condition = "GOOD",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "NS_without_embed/bp-good-retrievals.txt",
+            items      = "NS_without_embed/bp-good-items.txt",
+            data = 0.011,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   # second retrieval is critical
+
+        list(
+            condition = "BAD",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,                       
+            retrievals = "NS_without_embed/bp-bad-retrievals.txt",
+            items      = "NS_without_embed/bp-bad-items.txt",
+            data = 0.012,
+            measure="percent error",
+            correct.item = 1,
+            distractor.item = 2,
+            critical.retrieval = 2),   
+
+        list(
+            condition = "INTERFERER",
+            num.experimental.subjects = 45,
+            num.experimental.items = 18,
+            retrievals = "NS_without_embed/bp-interferer-retrievals.txt",
+            items      = "NS_without_embed/bp-interferer-items.txt",
             data = 0.013,
             measure="percent error",
             correct.item = 1,
@@ -70,7 +112,7 @@ bp = list(
 
 
 ## Complete list of experiments
-experiments = list(bp)
+experiments = list(bp_embed, bp_no_embed)
 num.experiments = length(experiments)
 
 
@@ -194,38 +236,28 @@ colnames(full.parameter.matrix) = c("cat.penalty", "F", "G", "ans", "mas", "d", 
 all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs))
 
 ## Loop over all runs and run the models
-start = Sys.time()
-for (r in 1:total.runs) {
+#start = Sys.time()
+foreach (r = icount(total.runs), .combine="+") %dopar% {
     print(paste("Executing run #",r,"of",total.runs))
     
     ## select out row corresponding to this run
     this.run = all.runs[r,]
     
     ## set output file name
-    filename.prefix = paste(this.run$experiment, "-", this.run$condition, "-", r, sep="")
-    output.file = output(paste(filename.prefix, "-output.html", sep=""))
+    #filename.prefix = paste(this.run$experiment, "-", this.run$condition, "-", r, sep="")
+    #output.file = output(paste(filename.prefix, "-output.html", sep=""))
     
     ## now set the model parameters according to this combination of values
     set.parameters(this.run[1:num.parameters])
     
     ## and run the model
-    item.file = as.character(this.run$items)
-    retrieval.file = as.character(this.run$retrievals)
-    num.experimental.items = this.run$num.experimental.items
+    item.file                 = as.character(this.run$items)
+    retrieval.file            = as.character(this.run$retrievals)
+    num.experimental.items    = this.run$num.experimental.items
     num.experimental.subjects = this.run$num.experimental.subjects
     
     results = run.model.quietly()
-    #results = run.model(quiet=FALSE)
-    
-    ## plot the activation profiles for the critical and distractor items
-    clrs = c("black", "green","blue","orange", "brown", "red", "purple")
-    
-    
-
-    pdf(file = output(paste(filename.prefix, "-activation-plots.pdf", sep="")), width=11, height=5)
-    plot.activation(moments, history, this.run$correct.item, this.run$distractor.item, this.run$experiment, this.run$condition)
-    dev.off()
-
+   
     ## now extract the relevant measure
     
     if (this.run$measure=="percent error") {
@@ -243,10 +275,6 @@ for (r in 1:total.runs) {
     all.runs[r,]$model = model.result
     all.runs[r,]$model.lower = model.result.lower
     all.runs[r,]$model.upper = model.result.upper
-    
-    
-    print(Sys.time() - start)
-    start = Sys.time()
 }
 
 ## Compute MSE and R^2 for each unique combination of parameter settings
@@ -655,10 +683,10 @@ plot.full.range.no.decay = function() {
 ## plot.best.overall.no.decay.no.mp()
 ## plot.individual.no.decay.no.mp()
 
-plot.best.overall.decay()
-plot.individual.decay()
+#plot.best.overall.decay()
+#plot.individual.decay()
 #plot.best.overall.decay.no.mp()
 #plot.individual.decay.no.mp()
 
 ##plot.full.range.no.decay()
-plot.full.range.decay()
+#plot.full.range.decay()
