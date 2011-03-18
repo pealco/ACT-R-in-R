@@ -17,18 +17,18 @@ compute.base.levels = function(moment) {
 		base.levels = matrix(0, nrow=num.items, ncol=trials)
 		return(base.levels)
 	}
-	
+
 	# time since last retrieval for each retrieval (converted from milliseconds)
 	tj = (moment/1000) - (moments/1000)
-	
+
 	# just pay attention to past, not future
 	past = history[, tj > 0]
 	num.past.retrievals = sum(tj > 0)
-	
+
 	# the decay function
 	tjd = tj ^ -d
 	decay = matrix(tjd[tj > 0], nrow=trials, ncol=num.past.retrievals, byrow=TRUE)
-	
+
 	base.levels = foreach(c = 1:num.items, .combine="rbind") %do% {
         retrievals = past == c                      # boolean matrix
         activations = retrievals * decay
@@ -36,7 +36,7 @@ compute.base.levels = function(moment) {
         b[is.infinite(b)] = 0                       # don't propagate through infinite values
         b
 	}
-	
+
 	return(base.levels)
 }
 
@@ -55,7 +55,7 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
 
     # compute the match between items and retrieval cues (a boolean matrix)
     cues = matrix(data=as.matrix(retrieval.cues), nrow=num.items, ncol=num.features, byrow=TRUE)
-    is.nil = item.features == "nil"    
+    is.nil = item.features == "nil"
     is.variable.cue = cues == "VAR"
 
     match = (item.features == cues)
@@ -82,16 +82,16 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
     cue.weights = 1 - as.integer(is.variable.cue[1,])/2
     cue.weights = cue.weights/sum(cue.weights[retrieval.cues!="NULL"])
 
-    W = G * cue.weights    
+    W = G * cue.weights
 
 #    W = G/num.cues
-    
+
     sw = matrix(strength * W, nrow=num.items, ncol=num.features, byrow=TRUE)
-    
+
     # compute extra activation for each item; sum must ignore NA's because
     # those correspond to features that are not retrieval cues.
-    extra = rowSums(match.inc.var * sw, na.rm=TRUE)    
-    
+    extra = rowSums(match.inc.var * sw, na.rm=TRUE)
+
     # compute mismatch penalty
     is.retrieval.cue = (cues != "NULL") & (cues != "VAR")
 
@@ -103,20 +103,20 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
 
     # mismatch = (!match & is.retrieval.cue)  | (is.variable.cue & is.nil)
     penalty = rowSums(mismatch * match.penalty)
-    
+
     # compute activation boost/penalty
     activation.adjustment = extra + penalty
-    boost = matrix(activation.adjustment, ncol=trials, nrow=num.items) 
+    boost = matrix(activation.adjustment, ncol=trials, nrow=num.items)
 
     # add to base-level
     if (modulate.by.distinct) {
       # compute how distinctive each item is (proportional to base-level activation)
-      d.boost = distinctiveness + base.levels   
+      d.boost = distinctiveness + base.levels
       activation = base.levels + boost * d.boost
     } else {
       activation = base.levels + boost
     }
-    
+
     noise = matrix(rlogis(trials*num.items, 0, ans), ncol=trials, nrow=num.items)
     noisy.activation = activation + noise
 
@@ -143,9 +143,9 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
 
     # find winning item for each trial, and count # of times each item won
     winner = apply(final.latency, 2, which.min)
-    winner.latency = apply(final.latency, 2, min)    
+    winner.latency = apply(final.latency, 2, min)
     counts = rep(0, num.items)
-    
+
     item.winners = NULL
     for (c in 1:num.items) {
 	counts[c] = sum(winner == c)
@@ -156,29 +156,29 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
     retrieval.prob.upper = rep(NA, num.items)
 
     if (!(is.na(num.experimental.items) | is.na(num.experimental.subjects))) {
-      
+
       # create a vector of subject IDs and experiment IDs
       subjects = rep(1:trials, each=num.experimental.items, length.out=trials)
       subject.means = aggregate(item.winners, by=list(subjects), FUN=mean)
-      
+
       # now create a vector of experiment IDs
       experiments = rep(1:trials, each=num.experimental.subjects, length.out=length(subject.means[, 1]))
       experiment.means = aggregate(subject.means, by=list(experiments), FUN=mean)
-      
+
       retrieval.prob.lower = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
                                 FUN=function(x) {
 #                                  return(quantile(x, probs=c(0.025)))
-                                  return(quantile(x, probs=c(0.1586)))                                  
+                                  return(quantile(x, probs=c(0.1586)))
                                 })
-      
+
       retrieval.prob.upper = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
                                 FUN=function(x) {
 #                                  return(quantile(x, probs=c(0.975)))
-                                  return(quantile(x, probs=c(0.8413)))                                  
+                                  return(quantile(x, probs=c(0.8413)))
                                 })
     }
 
-    
+
     # probability of retrieval
     retrieval.prob = counts / trials
     winner.latency.mean = mean(winner.latency)
@@ -187,13 +187,13 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
     summary =  data.frame(item=c(item.name, "WINNER"),
                            retrieval.prob=c(retrieval.prob, 1.0),
                            retrieval.prob.lower=c(retrieval.prob.lower, NA),
-                           retrieval.prob.upper=c(retrieval.prob.upper, NA),                           
+                           retrieval.prob.upper=c(retrieval.prob.upper, NA),
                            latency.mean=c(latency.mean, winner.latency.mean),
                            latency.sd=c(latency.sd, winner.latency.sd),
                            activation.mean=c(activation.mean, NA),
                            activation.sd=c(activation.sd, NA))
 
-    return(list(summary=summary, winner=winner, latency.mean=latency.mean, final.latency=final.latency))    
+    return(list(summary=summary, winner=winner, latency.mean=latency.mean, final.latency=final.latency))
 }
 
 
@@ -213,9 +213,9 @@ plot.activation.profiles = function(moments, history, min.time, max.time, increm
     for (t in time.span) {
 #	if (round(t/100)==t/100) {print(t)}
   	base.levels = compute.base.levels(t)
-	
+
 	# make items that don't exist yet have activation of NA
-	exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)    
+	exists = matrix(creation.moment <  t, ncol=trials, nrow=num.items)
 	activation  = base.levels*exists + 0*!exists
         activation[activation==0] = NA
 
@@ -235,11 +235,11 @@ plot.activation.profiles = function(moments, history, min.time, max.time, increm
                ylim=c(minb-0.5, maxb+0.5))
 
     lines(x=c(min(time.span), max(time.span)), y=c(0, 0), lty=3)
-    
+
     for (c in 1:num.items) {
       lines(base.activations[c,] ~ time.span, type="l", lwd=1.5, col=clrs[c])
     }
-    
+
     # add markers for the creation and retrieval moments at the bottom
     for (m in creation.moments) {
       lines(x=c(m, m), y=c(minb -0.1, minb-0.5), lend=2, lwd=2, col="darkgreen")
@@ -252,7 +252,7 @@ plot.activation.profiles = function(moments, history, min.time, max.time, increm
     # add a legend
     width = max.time - min.time
     height = maxb
-    legend(0.8*width+min.time, height+0.5, item.name, lty=1, lwd=1.5, bty="n", col = clrs[1:num.items]) 
+    legend(0.8*width+min.time, height+0.5, item.name, lty=1, lwd=1.5, bty="n", col = clrs[1:num.items])
   }
 
 
