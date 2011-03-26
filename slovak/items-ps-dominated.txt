@@ -1,8 +1,0 @@
-name	NP1	P1	PP1	NP2	VP1
-created	0	450	150	600	1050
-number	plural	nil	nil	nil	nil
-cat	NP	Prep	PP	NP	VP
-mom-cat	IP	PP	NP	PP	I-bar
-role	specT	headPP	adjNP	compP	compI
-NOM	yes	nil	nil	yes	nil
-ACC	yes	nil	nil	yes	nil

@@ -1,7 +1,0 @@
-moment	300	750	900	1200
-number	NULL	NULL	NULL	VAR
-cat	NP	NP	PP	NP
-mom-cat	VAR	PP	NP	IP
-role	specT	compP	adjNP	specT
-NOM	yes	NULL	NULL	yes
-ACC	no	NULL	NULL	no
