@@ -13,6 +13,10 @@
 
 library(reshape)
 library(gplots)
+library(foreach)
+library(doMC)
+
+registerDoMC()
 
 source("run-model.r")
 
@@ -301,7 +305,7 @@ all.runs = as.data.frame(cbind(full.parameter.matrix, model.runs));
 final.samples = matrix(data=NA, nrow=default.trials, ncol=total.runs)
 
 ## Loop over all runs and run the models
-for (r in 1:total.runs) {
+results = foreach (r = 1:total.runs, .combine="c") %do% {
     print(paste("Executing run #",r,"of",total.runs));
     
     ## select out row corresponding to this run
@@ -325,8 +329,11 @@ for (r in 1:total.runs) {
     # Latency.
     final.samples[,r] = results$latencies[[this.run$critical.retrieval]]
     
-    all.runs[r,]$model = model.result
+    model.result
 }
+
+all.runs$model = results
+
 
 write.csv(all.runs, "all.runs.txt")
 write.csv(final.samples, "final.samples.txt")
