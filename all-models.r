@@ -200,16 +200,16 @@ F = c(0.85)
 cat.penalty = c(-999);
 
 ## Total source activation
-G = c(0.7, 0.8, 1.0);
+G = seq(0.7, 1.0, 0.1)
 #G = c(1.0);
 
 
 ## Activation noise parameter for logistic distribution
-ans  = seq(0.45, 0.6, 0.05)
+ans  = seq(0.4, 0.7, 0.1)
 #ans  = c(0.45)
 
 ## Fan parameter
-mas = c(1.5, 2.0)
+mas = seq(1.5, 2.0, 0.1)
 #mas = c(1.5)
 
 
@@ -218,7 +218,7 @@ d = c(0.000001, 0.5)
 #d = c(0.5)
 
 ## Match penalty
-match.penalty = seq(-1.0, -0.4, 0.2)
+match.penalty = seq(-1.0, -0.4, 0.1)
 #match.penalty = c(-1.0)
 
 
