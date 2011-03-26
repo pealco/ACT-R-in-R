@@ -156,29 +156,6 @@ retrieve = function(cue.names, retrieval.cues, retrieval.moment) {
 
     retrieval.prob.lower = rep(NA, num.items)
     retrieval.prob.upper = rep(NA, num.items)
-
-    if (!(is.na(num.experimental.items) | is.na(num.experimental.subjects))) {
-      
-      # create a vector of subject IDs and experiment IDs
-      subjects = rep(1:trials, each=num.experimental.items, length.out=trials)
-      subject.means = aggregate(item.winners, by=list(subjects), FUN=mean)
-      
-      # now create a vector of experiment IDs
-      experiments = rep(1:trials, each=num.experimental.subjects, length.out=length(subject.means[, 1]))
-      experiment.means = aggregate(subject.means, by=list(experiments), FUN=mean)
-      
-      CI = 2.0
-      
-      retrieval.prob.lower = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
-                                FUN=function(x) {
-                                  return(quantile(x, probs=pnorm(-CI)))                                  
-                                })
-      
-      retrieval.prob.upper = apply(experiment.means[, 3:(2+num.items)], MARGIN=2,
-                                FUN=function(x) {
-                                  return(quantile(x, probs=pnorm(CI)))                                  
-                                })
-    }
     
     # probability of retrieval
     retrieval.prob = counts / trials

@@ -31,23 +31,17 @@ bp_embed = list(
     conditions = list(
         list(
             condition = "GOOD",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "NS_with_embed/bp-good-retrievals.txt",
             items      = "NS_with_embed/bp-good-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
             critical.retrieval = 2),   # second retrieval is critical
 
         list(
-            condition = "BAD",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,                       
+            condition = "BAD",                 
             retrievals = "NS_with_embed/bp-bad-retrievals.txt",
             items      = "NS_with_embed/bp-bad-items.txt",
-            data = 0.012,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -55,11 +49,8 @@ bp_embed = list(
 
         list(
             condition = "INTERFERER",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "NS_with_embed/bp-interferer-retrievals.txt",
             items      = "NS_with_embed/bp-interferer-items.txt",
-            data = 0.013,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -73,23 +64,17 @@ bp_no_embed = list(
     conditions = list(
         list(
             condition = "GOOD",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "NS_without_embed/bp-good-retrievals.txt",
             items      = "NS_without_embed/bp-good-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
             critical.retrieval = 2),   # second retrieval is critical
 
         list(
-            condition = "BAD",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,                       
+            condition = "BAD",                       
             retrievals = "NS_without_embed/bp-bad-retrievals.txt",
             items      = "NS_without_embed/bp-bad-items.txt",
-            data = 0.012,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -97,11 +82,8 @@ bp_no_embed = list(
 
         list(
             condition = "INTERFERER",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "NS_without_embed/bp-interferer-retrievals.txt",
             items      = "NS_without_embed/bp-interferer-items.txt",
-            data = 0.013,
             measure="percent error",
             correct.item = 1,
             distractor.item = 2,
@@ -116,11 +98,8 @@ agr_embed = list(
     conditions = list(
         list(
             condition = "GP",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_with_embed/agr-GP-retrievals.txt",
             items      = "agr_with_embed/agr-GP-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -128,11 +107,8 @@ agr_embed = list(
 
         list(
             condition = "GS",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_with_embed/agr-GS-retrievals.txt",
             items      = "agr_with_embed/agr-GS-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -140,11 +116,8 @@ agr_embed = list(
 
         list(
             condition = "UP",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_with_embed/agr-UP-retrievals.txt",
             items      = "agr_with_embed/agr-UP-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -152,11 +125,8 @@ agr_embed = list(
             
         list(
             condition = "US",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_with_embed/agr-US-retrievals.txt",
             items      = "agr_with_embed/agr-US-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -171,11 +141,8 @@ agr_no_embed = list(
     conditions = list(
         list(
             condition = "GP",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_without_embed/agr-GP-retrievals.txt",
             items      = "agr_without_embed/agr-GP-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -183,11 +150,8 @@ agr_no_embed = list(
 
         list(
             condition = "GS",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_without_embed/agr-GS-retrievals.txt",
             items      = "agr_without_embed/agr-GS-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -195,11 +159,8 @@ agr_no_embed = list(
 
         list(
             condition = "UP",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_without_embed/agr-UP-retrievals.txt",
             items      = "agr_without_embed/agr-UP-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -207,11 +168,8 @@ agr_no_embed = list(
             
         list(
             condition = "US",
-            num.experimental.subjects = NA,
-            num.experimental.items = NA,
             retrievals = "agr_without_embed/agr-US-retrievals.txt",
             items      = "agr_without_embed/agr-US-items.txt",
-            data = 0.011,
             measure="percent error",
             correct.item = 2,
             distractor.item = 1,
@@ -316,15 +274,10 @@ for (e in 1:num.experiments) {
                    condition                 = rep(cond$condition, num.combinations),
                    retrievals                = rep(cond$retrievals, num.combinations),
                    items                     = rep(cond$items, num.combinations),
-                   num.experimental.items    = rep(cond$num.experimental.items, num.combinations),
-                   num.experimental.subjects = rep(cond$num.experimental.subjects, num.combinations),
                    measure                   = rep(cond$measure, num.combinations),
                    critical.retrieval        = rep(cond$critical.retrieval, num.combinations),
                    correct.item              = rep(cond$correct.item, num.combinations),
                    distractor.item           = rep(cond$distractor.item, num.combinations),
-                   data                      = rep(cond$data, num.combinations),
-#                  data.lower = rep(cond$data - cond$data.se, num.combinations),
-#                  data.upper = rep(cond$data + cond$data.se, num.combinations),
                    model                     = rep(NA, num.combinations)
                    )
                 ) # placeholder for
@@ -360,8 +313,6 @@ for (r in 1:total.runs) {
     ## and run the model
     item.file = as.character(this.run$items);
     retrieval.file = as.character(this.run$retrievals);
-    #num.experimental.items = this.run$num.experimental.items;
-    #num.experimental.subjects = this.run$num.experimental.subjects;
     
     results = run.model()
         
