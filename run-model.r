@@ -56,7 +56,6 @@ set.parameters <- function(p) {
 run.model <- function(quiet=TRUE) {
     trials <<- default.trials  
     
-    print("Starting to run model....")
     ## Read in the item definitions: each item is a feature vector
     items <<- read.delim(file=item.file,header=FALSE,colClasses="character")
     num.columns <<- length(items)
